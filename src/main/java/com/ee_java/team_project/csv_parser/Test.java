@@ -14,12 +14,18 @@ import java.util.List;
 import java.util.Map;
 
 
-
+/**
+ * The test endpoint.
+ */
 @Path("/parsed_items")
 public class Test {
-
-    @QueryParam("test") String test;
-
+    
+    /**
+     * Test response.
+     *
+     * @param uriInfo the uri info
+     * @return the response
+     */
     @GET
     @Produces("application/json")
     //TODO: endpoint getItemByID -> return 1 JSON object
@@ -28,7 +34,7 @@ public class Test {
     public Response test(@Context UriInfo uriInfo) {
         CodingCompCsvUtil parser = new CodingCompCsvUtil();
         Map<List<String>, String> parsed = parser.readCsvFileFileWithoutPojo("/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/claims.csv");
-        String parsedItemsRawJSON;
+        String parsedItemsRawJSON = null;
         List<String> keys;
         for (Map.Entry<List<String>, String> entry : parsed.entrySet()) { // parse once to init
             keys = entry.getKey();
@@ -42,10 +48,10 @@ public class Test {
         for (Map.Entry<String,String> param : map.entrySet()) {
             //TODO: parse through query params. if param is on of the #keys
             // then filter #parsedItemsRawJSON (either by making it JSON and parsing or another way)
-            // extra: handling numeric comparison (e.g: query param #idLessThan=100 then filter and leave ids < 100)
+            // TODO/extra: handling numeric comparison (e.g: query param #idLessThan=100 then filter and leave ids < 100)
             System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
         }
-        return Response.status(200).entity(test).build();
+        return Response.status(200).entity(parsedItemsRawJSON).build();
     }
 
     private Map<String,String> prepareParameters(MultivaluedMap<String, String> queryParameters) {
@@ -55,6 +61,5 @@ public class Test {
             parameters.put(str, queryParameters.getFirst(str));
         }
         return parameters;
-
     }
 }

@@ -12,8 +12,19 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 
+/**
+ * The Csv parser.
+ */
 public class CodingCompCsvUtil {
 
+	/**
+	 * Read csv file with pojo.
+	 *
+	 * @param <T>       the type parameter
+	 * @param filePath  the file path
+	 * @param classType the class type
+	 * @return the list
+	 */
 	/* #1
 	 * readCsvFile() -- Read in a CSV File and return a list of entries in that file.
 	 * @param filePath -- Path to file being read in.
@@ -42,6 +53,12 @@ public class CodingCompCsvUtil {
 		return objects;
 	}
 
+	/**
+	 * Read csv file file without pojo.
+	 *
+	 * @param filePath the file path
+	 * @return the map
+	 */
 	public Map<List<String>, String> readCsvFileFileWithoutPojo(String filePath) {
 		List<String> lblList = null;
 		ArrayList<String[]> dataList = new ArrayList<>();
@@ -104,7 +121,13 @@ public class CodingCompCsvUtil {
 		return s != null && s.matches("[-+]?\\d*\\.?\\d+");
 	}
 
-	//rough testing
+	/**
+	 * The entry point of application.
+	 *
+	 * @param args the input arguments
+	 * @throws IOException the io exception
+	 */
+//rough testing
 	public static void main(String[] args) throws IOException {
 
 		CodingCompCsvUtil csvUtil = new CodingCompCsvUtil();
