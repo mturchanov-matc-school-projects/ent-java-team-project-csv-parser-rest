@@ -1,0 +1,5 @@
+# Ignore IntelliJ IDEA user-specific files
+.idea/
+
+# Ignore build directory
+target/
