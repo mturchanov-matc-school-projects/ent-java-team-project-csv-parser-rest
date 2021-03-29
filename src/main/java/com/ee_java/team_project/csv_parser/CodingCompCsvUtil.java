@@ -133,9 +133,9 @@ public class CodingCompCsvUtil {
 		CodingCompCsvUtil csvUtil = new CodingCompCsvUtil();
 
 		//csv-parser for agents.csv, claims.csv, vendors.csv
-		String filePathForAgents = "/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/agents.csv";
-		String filePathForCustomers = "/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/customers.csv";
-		String filePathForClaims = "/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/claims.csv";
+		String filePathForAgents = "D:\\MATC\\ent-java-team-project-csv-parser-rest\\src\\main\\resources\\DataFiles\\agents.csv";
+		String filePathForCustomers = "D:\\MATC\\ent-java-team-project-csv-parser-rest\\src\\main\\resources\\DataFiles\\customers.csv";
+		String filePathForClaims = "D:\\MATC\\ent-java-team-project-csv-parser-rest\\src\\main\\resources\\DataFiles\\claims.csv";
 
 		CodingCompCsvUtil csvUtil1 = new CodingCompCsvUtil();
 		//String customersResult = csvUtil.readCsvFileFileWithoutPojo(filePathForCustomers);

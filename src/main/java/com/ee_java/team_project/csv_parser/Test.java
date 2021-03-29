@@ -29,11 +29,36 @@ public class Test {
     @GET
     @Produces("application/json")
     //TODO: endpoint getItemByID -> return 1 JSON object
+    @Path("/parsed_agent")
+    public Response getItemById(@Context UriInfo uriInfo) {
+
+        CodingCompCsvUtil parser;
+        parser = new CodingCompCsvUtil();
+        Map<List<String>, String> parsed = parser.readCsvFileFileWithoutPojo("D:\\MATC\\ent-java-team-project-csv-parser-rest\\src\\main\\resources\\DataFiles\\agents.csv");
+        String parsedItemsRawJSON = null;
+        List<String> keys;
+        for (Map.Entry<List<String>, String> entry : parsed.entrySet()) { // parse once to init
+            keys = entry.getKey();
+            parsedItemsRawJSON = entry.getValue();
+        }
+
+        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(); //gets all queryParams(url?p=v&etc)
+        Map<String, String> map = prepareParameters(queryParams);
+
+        for (Map.Entry<String,String> param : map.entrySet()) {
+            //TODO: parse through query params. if param is one of the #keys
+            // then filter #parsedItemsRawJSON (either by making it JSON and parsing or another way)
+            // TODO/extra: handling numeric comparison (e.g: query param #idLessThan=100 then filter and leave ids < 100)
+            System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
+        }
+
+        return Response.status(200).entity(parsedItemsRawJSON).build();
+    }
     //TODO: endpoint count return -> count based on query params
     //TODO: endpoint getItemsBasedOnParams -> return JSON objects based on query params
     public Response test(@Context UriInfo uriInfo) {
         CodingCompCsvUtil parser = new CodingCompCsvUtil();
-        Map<List<String>, String> parsed = parser.readCsvFileFileWithoutPojo("/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/claims.csv");
+        Map<List<String>, String> parsed = parser.readCsvFileFileWithoutPojo("D:\\MATC\\ent-java-team-project-csv-parser-rest\\src\\main\\resources\\DataFiles\\claims.csv");
         String parsedItemsRawJSON = null;
         List<String> keys;
         for (Map.Entry<List<String>, String> entry : parsed.entrySet()) { // parse once to init
@@ -46,7 +71,7 @@ public class Test {
 
 
         for (Map.Entry<String,String> param : map.entrySet()) {
-            //TODO: parse through query params. if param is on of the #keys
+            //TODO: parse through query params. if param is one of the #keys
             // then filter #parsedItemsRawJSON (either by making it JSON and parsing or another way)
             // TODO/extra: handling numeric comparison (e.g: query param #idLessThan=100 then filter and leave ids < 100)
             System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
