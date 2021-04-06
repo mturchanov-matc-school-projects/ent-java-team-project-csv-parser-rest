@@ -42,7 +42,7 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
     private final Logger logger = LogManager.getLogger();
 
     public static final String PROPERTIES_PATH = "/webapp.properties";
-    public static final String UPLOAD_PATH_PROPERTY = "upload-path";
+    public static final String UPLOAD_PATH_PROPERTY = "upload.path";
 
     /**
      * Initializes the servlet with a properties instance to load
@@ -56,6 +56,17 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
     }
 
     /**
+     * Handles GET requests by redirecting to index page.
+     * @param request The HttpServletRequest object.
+     * @param response The HttpServletResponse object.
+     * @throws ServletException Whether or not the servlet encounters an error.
+     * @throws IOException Whether or not an IO exception occurs.
+     */
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.sendRedirect("index.jsp");
+    }
+
+    /**
      * Processes files uploaded via the upload form for CSV parsing.
      * @param request The HttpServletRequest object.
      * @param response The HttpServletResponse object.
@@ -63,16 +74,22 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      * @throws IOException Whether or not an IO exception occurs.
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String url = "/index.jsp";
         String feedback = "Failed to upload the file. Please try again later.";
         String path = writeUploadedFiles(request.getParts());
 
+        // Verify that a file was successfully written in the upload directory
         if (path != null) {
             CodingCompCsvUtil parser = new CodingCompCsvUtil();
             Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
 
-            logger.debug("Successfully uploaded and parsed CSV file into map consisting of {} entry(s)", values.size());
-            logger.debug("Loaded map contains values: {}", values);
+            // Retrieves the raw JSON text from the values map, expecting only 1 entry in the map
+            Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
+            String rawJson = entry.getValue();
 
+            request.setAttribute("json", rawJson);
+
+            url = "/endpoints.jsp";
             feedback = "Successfully uploaded CSV file";
 
             boolean success = deleteFile(path);
@@ -83,7 +100,8 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
 
         request.setAttribute("feedback", feedback);
 
-        response.sendRedirect("index.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(url);
+        dispatcher.forward(request, response);
     }
 
     /**
