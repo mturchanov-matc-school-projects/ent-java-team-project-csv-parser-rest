@@ -1,5 +1,6 @@
 package com.ee_java.team_project.controller;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -9,10 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.security.Security;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import com.ee_java.team_project.csv_parser.CodingCompCsvUtil;
 import com.ee_java.team_project.util.PropertiesLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +52,6 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
     public void init() throws ServletException {
         properties = loadProperties(PROPERTIES_PATH);
         uploadPath = properties.getProperty(UPLOAD_PATH_PROPERTY);
-        logger.debug("Loaded upload path of {}", uploadPath);
         initializeUploadPath(uploadPath);
     }
 
@@ -59,8 +63,27 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      * @throws IOException Whether or not an IO exception occurs.
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        boolean success = writeUploadedFiles(request.getParts());
-        logger.debug("Received POST request with upload success status: {}!", success);
+        String feedback = "Failed to upload the file. Please try again later.";
+        String path = writeUploadedFiles(request.getParts());
+
+        if (path != null) {
+            CodingCompCsvUtil parser = new CodingCompCsvUtil();
+            Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
+
+            logger.debug("Successfully uploaded and parsed CSV file into map consisting of {} entry(s)", values.size());
+            logger.debug("Loaded map contains values: {}", values);
+
+            feedback = "Successfully uploaded CSV file";
+
+            boolean success = deleteFile(path);
+            if (!success) {
+                logger.error("Unable to remove file {} for cleanup.", path);
+            }
+        }
+
+        request.setAttribute("feedback", feedback);
+
+        response.sendRedirect("index.jsp");
     }
 
     /**
@@ -69,7 +92,6 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      */
     public void initializeUploadPath(String path) {
         File filePath = new File(path);
-        if (filePath == null) logger.debug("File path is NULL!");
         if (!filePath.exists()) {
             filePath.mkdirs();
         }
@@ -79,10 +101,10 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      * Writes the provided uploaded parts into the upload directory for this web
      * application.
      * @param parts The Collection of Part objects to write.
-     * @return Whether or not the file was able to be written in the upload directory.
+     * @return The path to the new file or null.
      */
-    public boolean writeUploadedFiles(Collection<Part> parts) {
-        boolean success = false;
+    public String writeUploadedFiles(Collection<Part> parts) {
+        String path = null;
         for (Part part : parts) {
             try {
                 Timestamp stamp = new Timestamp(System.currentTimeMillis());
@@ -90,19 +112,37 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
                 String analysisPath = uploadPath + "/";
                 initializeUploadPath(analysisPath);
 
-                String fileName = analysisPath + stamp.toString() + ".csv";
-                part.write(fileName);
-
-                success = true;
+                path = analysisPath + stamp.toString() + ".csv";
+                part.write(path);
             } catch (IOException exception) {
-                System.out.println("Error writing uploaded file!");
+                logger.error("Error writing uploaded file!", exception);
                 exception.printStackTrace();
             } catch (Exception exception) {
-                System.out.println("Unknown exception!");
+                logger.error("Unknown exception!", exception);
                 exception.printStackTrace();
             }
         }
-        return success;
+        return path;
+    }
+
+    /**
+     * Deletes the file at a given path if it exists.
+     * @param path The String path of the directory to create.
+     * @return Whether or not the file was able to be deleted.
+     */
+    public boolean deleteFile(String path) {
+        File filePath = new File(path);
+        if (filePath.exists()) {
+            try {
+                return filePath.delete();
+            } catch (SecurityException exception) {
+                logger.error("Unable to delete file due to lack of permissions.", exception);
+            } catch (Exception exception) {
+                String message = String.format("Unknown error occurred while removing uploaded file %s.", path);
+                logger.error(message, exception);
+            }
+        }
+        return false;
     }
 
 }
