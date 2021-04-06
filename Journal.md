@@ -18,3 +18,6 @@ Tasks Completed:
 * Add basic CSV file form upload and processing servlet
 * Add webapp properties configuration file
 * Stylize index page with Bootstrap
+
+4/6/2021 ~ 14:00-TBD
+* Add CSV file cleanup method
