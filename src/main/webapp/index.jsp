@@ -1,11 +1,34 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="en">
+<c:set var="title" value="CSV Parser - Upload" scope="request"></c:set>
+<c:import url="templates/head.jsp"></c:import>
+<body class="bg-dark">
 
-<html>
-<body>
 <!-- TODO: documentation on endpoint
      TODO/extra: dynamically form endpoint url. (catch #csvParams in controller send to the view)
               then parse through parameters in a form(taglib) and with js shape the end-point url
 -->
-<h2>Check out parsed <a href="http://localhost:8080/RestCsvparser_war_exploded/rest/parsed_items"><code>claims.csv</code></a> </h2>
+    <div class="container bg-white p-3">
+        <h1>Upload File</h1>
+        <p>In order to use this service, you must upload a CSV file that will be parsed and converted into JSON.</p>
+        <p><span class="text-danger">*</span> - Required field</p>
+
+        <form action="upload" method="post" enctype="multipart/form-data">
+            <p><span class="text-danger">*</span>Upload a Comma-Separated Value (.csv) file</p>
+            <div class="custom-file mb-3">
+                <label for="file" class="custom-file-label">Choose file</label>
+                <input id="file" type="file" name="file" class="custom-file-input" accept="text/csv" required>
+            </div>
+            <input type="submit" value="Upload" class="btn btn-primary">
+        </form>
+
+        <c:choose>
+            <c:when test="${feedback != null}">
+                <p class="text-danger">${feedback}</p>
+            </c:when>
+        </c:choose>
+    </div>
 </body>
+<c:import url="templates/scripts.jsp"></c:import>
 </html>
