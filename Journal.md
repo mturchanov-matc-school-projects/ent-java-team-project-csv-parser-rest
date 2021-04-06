@@ -14,12 +14,12 @@ Tasks Completed:
 * readme created
 * screenshot of parsed claims.csv added as a week9 exercise
 
-4/5/2021 ~ 3 Hours
+4/5/2021 ~ 3 hours
 * Add basic CSV file form upload and processing servlet
 * Add webapp properties configuration file
 * Stylize index page with Bootstrap
 
-4/6/2021 ~ 14:00-TBD
+4/6/2021 ~ 3 hours
 * Add CSV file cleanup method
 * Add feedback messages for users based on upload status
 * Add page to select endpoint for processing JSON
