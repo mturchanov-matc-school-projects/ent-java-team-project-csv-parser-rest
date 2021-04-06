@@ -13,21 +13,19 @@
      TODO/extra: dynamically form endpoint url. (catch #csvParams in controller send to the view)
               then parse through parameters in a form(taglib) and with js shape the end-point url
 -->
-    <div class="container bg-white">
-        <h1>CSV Parser API Documentation</h1>
-        <p>To use the CSV parser API, there are several handy features available to load data.</p>
-        <p>While uploading personal CSV files is not currently available, you can access the following data on a
-            pre-made <a href="files/claims.csv">clams.csv</a> file.</p>
+    <div class="container bg-white p-3">
+        <h1>Upload File</h1>
+        <p>In order to use this service, you must upload a CSV file that will be parsed and converted into JSON.</p>
+        <p><span class="text-danger">*</span> - Required field</p>
 
-        <section>
-            <div class="card">
-                <div class="card-body">
-                    <p class="card-title h3">All Claims</p>
-                    <p class="card-text small">/rest/parsed_items</p>
-                    <p class="card-text">Returns a JSON array of all claims.</p>
-                </div>
+        <form action="upload" method="post" enctype="multipart/form-data">
+            <p><span class="text-danger">*</span>Upload a Comma-Separated Value (.csv) file</p>
+            <div class="custom-file mb-3">
+                <label for="file" class="custom-file-label">Choose file</label>
+                <input id="file" type="file" class="custom-file-input" accept="text/csv" required>
             </div>
-        </section>
+            <input type="submit" value="Upload" class="btn btn-primary">
+        </form>
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
