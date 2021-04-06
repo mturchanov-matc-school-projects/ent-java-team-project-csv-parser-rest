@@ -28,7 +28,8 @@ public class UploadAction extends HttpServlet {
      * @throws IOException Whether or not an IO exception occurs.
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        logger.debug("Received POST request!");
+        String tempFilePath = request.getParameter("file");
+        logger.debug("Received POST request with file @ {}!", tempFilePath);
     }
 
 }
