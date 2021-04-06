@@ -21,3 +21,5 @@ Tasks Completed:
 
 4/6/2021 ~ 14:00-TBD
 * Add CSV file cleanup method
+* Add feedback messages for users based on upload status
+* Add page to select endpoint for processing JSON
