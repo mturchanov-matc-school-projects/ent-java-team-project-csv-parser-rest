@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <c:set var="title" value="CSV Parser - Filter" scope="request"></c:set>
@@ -14,7 +15,7 @@
             </c:when>
         </c:choose>
 
-        <form id="queryForm" action="">
+        <form id="queryForm" action="" method="post">
             <div class="form-group">
                 <label for="queryTypeInput">Search for Item</label>
                 <select name="queryType" id="queryTypeInput" class="form-control">
@@ -37,6 +38,8 @@
                     <input id="queryColumnValue" name="queryColumnValue" type="text" class="form-control">
                 </div>
             </div>
+
+            <input type="hidden" name="json" value="${fn:escapeXml(json)}">
 
             <input type="submit" class="btn btn-primary">
 
