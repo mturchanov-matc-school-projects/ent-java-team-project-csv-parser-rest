@@ -23,3 +23,4 @@ Tasks Completed:
 * Add CSV file cleanup method
 * Add feedback messages for users based on upload status
 * Add page to select endpoint for processing JSON
+* Add JavaScript form styling for HTML file input labels
