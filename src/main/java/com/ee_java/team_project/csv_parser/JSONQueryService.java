@@ -34,14 +34,15 @@ public class JSONQueryService {
 
         switch (queryType) {
             case "value":
-                // TODO: Implement search by value
+                String column = parameters.get("queryColumn");
+                String value = parameters.get("queryColumnValue");
+                logger.debug("Querying JSON in column '{}' for value '{}'", column, value);
                 break;
             case "all":
             default:
                 break;
         }
 
-        logger.debug("Received POST containing JSON {}", json);
         return Response.status(200).entity(finalJson).build();
     }
 
