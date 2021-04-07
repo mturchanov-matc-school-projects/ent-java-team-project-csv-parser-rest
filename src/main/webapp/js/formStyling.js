@@ -10,22 +10,15 @@ const hideAllVariableFields = () => {
     queryColumnGroup.hidden = true;
 }
 
-const setQueryFormAction = action => {
-    let form = document.querySelector("#queryForm");
-    form.action = action;
-}
-
 const updateHiddenFields = queryType => {
     let queryColumnGroup = document.querySelector("#queryColumnGroup");
     hideAllVariableFields();
     switch (queryType) {
         case "value":
-            setQueryFormAction("rest/query");
             queryColumnGroup.hidden = false;
             break;
         case "all":
         default:
-            setQueryFormAction("rest/query");
             break;
     }
 }
