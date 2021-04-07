@@ -20,12 +20,12 @@ const updateHiddenFields = queryType => {
     hideAllVariableFields();
     switch (queryType) {
         case "value":
-            setQueryFormAction("rest/parsed_items");
+            setQueryFormAction("rest/query");
             queryColumnGroup.hidden = false;
             break;
         case "all":
         default:
-            setQueryFormAction("rest/parsed_items");
+            setQueryFormAction("rest/query");
             break;
     }
 }
