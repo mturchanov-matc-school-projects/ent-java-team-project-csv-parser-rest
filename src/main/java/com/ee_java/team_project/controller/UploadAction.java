@@ -85,8 +85,10 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
 
             // Retrieves the raw JSON text from the values map, expecting only 1 entry in the map
             Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
+            List<String> columns = entry.getKey();
             String rawJson = entry.getValue();
 
+            request.setAttribute("columns", columns);
             request.setAttribute("json", rawJson);
 
             url = "/endpoints.jsp";

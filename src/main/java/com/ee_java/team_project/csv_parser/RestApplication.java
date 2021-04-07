@@ -15,7 +15,8 @@ public class RestApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         HashSet h = new HashSet<Class<?>>();
-        h.add(Test.class );
+        h.add(Test.class);
+        h.add(JSONQueryService.class);
         return h;
     }
 }
