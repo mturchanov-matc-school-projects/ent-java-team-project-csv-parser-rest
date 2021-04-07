@@ -15,7 +15,7 @@
             </c:when>
         </c:choose>
 
-        <form id="queryForm" action="" method="post">
+        <form id="queryForm" action="rest/query" method="post">
             <div class="form-group">
                 <label for="queryTypeInput">Search for Item</label>
                 <select name="queryType" id="queryTypeInput" class="form-control">
