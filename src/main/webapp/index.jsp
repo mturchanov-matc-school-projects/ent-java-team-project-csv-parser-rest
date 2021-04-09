@@ -17,7 +17,7 @@
         <form action="upload" method="post" enctype="multipart/form-data">
             <p><span class="text-danger">*</span>Upload a Comma-Separated Value (.csv) file</p>
             <div class="custom-file mb-3">
-                <label id="fileInputLabel" for="file" class="custom-file-label">Choose file</label>
+                <label id="fileInputLabel" for="fileInput" class="custom-file-label">Choose file</label>
                 <input id="fileInput" type="file" name="file" class="custom-file-input" accept="text/csv" required>
             </div>
             <input type="submit" value="Upload" class="btn btn-primary">

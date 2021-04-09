@@ -72,7 +72,10 @@ public class JSONQueryService {
     @Produces("application/json")
     public Response postSearchJson(Form form) {
         MultivaluedMap<String, String> parameters = form.asMap();
-        // TODO: Add error handling if no JSON parameter is passed (null)
+        // TODO: Add error handling if no JSON parameter is passed (null) (find error code?)
+        if (parameters == null) {
+            logger.error("no parameter, its null!");
+        }
         String json = parameters.getFirst("json");
 
         // Perform query with parameters
