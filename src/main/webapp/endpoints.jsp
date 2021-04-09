@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <c:set var="title" value="CSV Parser - Filter" scope="request"></c:set>
@@ -15,38 +14,32 @@
             </c:when>
         </c:choose>
 
-        <form id="queryForm" action="rest/query" method="post">
+        <form id="queryForm" action="" method="get">
             <div class="form-group">
-                <label for="queryTypeInput">Search for Item</label>
-                <select name="queryType" id="queryTypeInput" class="form-control">
-                    <option value="all">Get All Items</option>
-                    <option value="value">Get Item(s) with Column Value</option>
+                <label for="jsonTextArea">Parsed JSON</label>
+                <textarea id="jsonTextArea" class="form-control" readonly>${json}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="queryTypeInput">JSON Filter</label>
+                <select id="queryTypeInput" class="form-control">
+                    <option value="count">Get Count</option>
+                    <option value="search">Search Column(s)</option>
                 </select>
             </div>
 
             <div id="queryColumnGroup">
-                <div class="form-group">
-                    <label for="queryColumnInput">Search in Column</label>
-                    <select name="queryColumn" id="queryColumnInput" class="form-control">
-                        <c:forEach var="column" items="${columns}">
-                            <option value="${column}">${column}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="queryColumnValue">Search for Value</label>
-                    <input id="queryColumnValue" name="queryColumnValue" type="text" class="form-control">
-                </div>
-            </div>
+                <p>Enter Values to Search</p>
 
-            <input type="hidden" name="json" value="${fn:escapeXml(json)}">
+                <c:forEach var="column" items="${columns}">
+                    <div class="form-group">
+                        <label for="${column}">${column}</label>
+                        <input type="text" id="${column}" name="${column}" class="form-control">
+                    </div>
+                </c:forEach>
+            </div>
 
             <input type="submit" class="btn btn-primary">
-
-            <div class="form-group">
-                <label for="jsonTextArea">Raw JSON</label>
-                <textarea id="jsonTextArea" class="form-control" readonly>${json}</textarea>
-            </div>
         </form>
     </div>
 </body>
