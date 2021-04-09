@@ -23,6 +23,15 @@ import java.util.Map;
 @Path("/elements")
 public class JSONQueryService {
     private static final Logger logger = LogManager.getLogger();
+
+    /**
+     * Performs a JSON query using the session's stored JSON from parsing a CSV file.
+     * @param uriInfo The URI info that contains query parameters to search with.
+     * @return The response containing the queried JSON element.
+     */
+    public Response getQueryJSON(@Context UriInfo uriInfo) {
+        return Response.status(200).build();
+    }
     
     /**
      * Returns JSON elements based on the query type and additional parameters provided.
