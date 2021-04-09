@@ -15,38 +15,13 @@
             </c:when>
         </c:choose>
 
-        <form id="queryForm" action="rest/query" method="post">
-            <div class="form-group">
-                <label for="queryTypeInput">Search for Item</label>
-                <select name="queryType" id="queryTypeInput" class="form-control">
-                    <option value="all">Get All Items</option>
-                    <option value="value">Get Item(s) with Column Value</option>
-                </select>
-            </div>
-
-            <div id="queryColumnGroup">
-                <div class="form-group">
-                    <label for="queryColumnInput">Search in Column</label>
-                    <select name="queryColumn" id="queryColumnInput" class="form-control">
-                        <c:forEach var="column" items="${columns}">
-                            <option value="${column}">${column}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="queryColumnValue">Search for Value</label>
-                    <input id="queryColumnValue" name="queryColumnValue" type="text" class="form-control">
-                </div>
-            </div>
-
-            <input type="hidden" name="json" value="${fn:escapeXml(json)}">
-
-            <input type="submit" class="btn btn-primary">
-
-            <div class="form-group">
-                <label for="jsonTextArea">Raw JSON</label>
-                <textarea id="jsonTextArea" class="form-control" readonly>${json}</textarea>
-            </div>
+        <form id="queryForm" action="${pageContext.request.contextPath}/rest/jsonqueryservice/search" method="get">
+            <c:forEach var="column" items="${columns}">
+                <label for="${column}">${column}</label>
+                <input type="text" name="${column}" id="${column}"> <br>
+            </c:forEach>
+            <br>
+            <input type="submit" value="Ok">
         </form>
     </div>
 </body>
