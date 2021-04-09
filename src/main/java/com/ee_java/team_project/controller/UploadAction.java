@@ -4,10 +4,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import javax.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
 import java.security.Security;
@@ -88,8 +85,9 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
             List<String> columns = entry.getKey();
             String rawJson = entry.getValue();
 
-            request.setAttribute("columns", columns);
-            request.setAttribute("json", rawJson);
+            HttpSession session = request.getSession();
+            session.setAttribute("columns", columns);
+            session.setAttribute("json", rawJson);
 
             url = "/endpoints.jsp";
             feedback = "Successfully uploaded CSV file";
