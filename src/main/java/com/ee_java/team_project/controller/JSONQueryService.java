@@ -34,7 +34,7 @@ public class JSONQueryService {
     @GET
     @Path("/count")
     @Produces("application/json")
-    public Response getCountJson(@Context UriInfo uriInfo, HttpServletRequest request) {
+    public Response getCountJson(@Context UriInfo uriInfo, @Context HttpServletRequest request) {
         MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
         // TODO: Get JSON from session attribute
         HttpSession session = request.getSession();
@@ -55,7 +55,7 @@ public class JSONQueryService {
     @GET
     @Path("/search")
     @Produces("application/json")
-    public Response getSearchJson(@Context UriInfo uriInfo, HttpServletRequest request) {
+    public Response getSearchJson(@Context UriInfo uriInfo, @Context HttpServletRequest request) {
         MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
         // TODO: Get JSON from session attribute
         HttpSession session = request.getSession();
