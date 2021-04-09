@@ -1,4 +1,4 @@
-package com.ee_java.team_project.csv_parser;
+package com.ee_java.team_project.controller;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
