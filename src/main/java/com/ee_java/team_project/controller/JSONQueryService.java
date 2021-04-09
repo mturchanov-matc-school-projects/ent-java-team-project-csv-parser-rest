@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -32,10 +34,12 @@ public class JSONQueryService {
     @GET
     @Path("/count")
     @Produces("application/json")
-    public Response getCountJson(@Context UriInfo uriInfo) {
+    public Response getCountJson(@Context UriInfo uriInfo, HttpServletRequest request) {
         MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
         // TODO: Get JSON from session attribute
-        String json = "[]";
+        HttpSession session = request.getSession();
+
+        String json = (String)session.getAttribute("json");
 
         int count = queryJson(json, parameters).size();
         String finalJson = String.format("{\"count\": %d}", count);
@@ -51,10 +55,12 @@ public class JSONQueryService {
     @GET
     @Path("/search")
     @Produces("application/json")
-    public Response getSearchJson(@Context UriInfo uriInfo) {
+    public Response getSearchJson(@Context UriInfo uriInfo, HttpServletRequest request) {
         MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
         // TODO: Get JSON from session attribute
-        String json = "[]";
+        HttpSession session = request.getSession();
+
+        String json = (String)session.getAttribute("json");
 
         String finalJson = queryJson(json, parameters).toString();
 
@@ -72,7 +78,10 @@ public class JSONQueryService {
     @Produces("application/json")
     public Response postSearchJson(Form form) {
         MultivaluedMap<String, String> parameters = form.asMap();
-        // TODO: Add error handling if no JSON parameter is passed (null)
+        // TODO: Add error handling if no JSON parameter is passed (null) (find error code?)
+        if (parameters == null) {
+            logger.error("no parameter, its null!");
+        }
         String json = parameters.getFirst("json");
 
         // Perform query with parameters
