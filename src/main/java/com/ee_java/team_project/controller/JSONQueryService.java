@@ -10,6 +10,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.io.StringReader;
 import com.google.gson.stream.JsonReader;
+import org.graalvm.compiler.nodes.memory.MemoryCheckpoint;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.HashMap;
@@ -32,9 +34,15 @@ public class JSONQueryService {
     @GET
     @Path("/count")
     @Produces("application/json")
-    public Response getCountJSON(@Context UriInfo uriInfo) {
-        String json = "{\"count\": 0}";
-        return Response.status(200).entity(json).build();
+    public Response getCountJson(@Context UriInfo uriInfo) {
+        MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
+        // TODO: Get JSON from session attribute
+        String json = "[]";
+
+        int count = queryJson(json, parameters).size();
+        String finalJson = String.format("{\"count\": %d}", count);
+
+        return Response.status(200).entity(finalJson).build();
     }
 
     /**
@@ -45,9 +53,14 @@ public class JSONQueryService {
     @GET
     @Path("/search")
     @Produces("application/json")
-    public Response getSearchJSON(@Context UriInfo uriInfo) {
+    public Response getSearchJson(@Context UriInfo uriInfo) {
+        MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
+        // TODO: Get JSON from session attribute
         String json = "[]";
-        return Response.status(200).entity(json).build();
+
+        String finalJson = queryJson(json, parameters).toString();
+
+        return Response.status(200).entity(finalJson).build();
     }
     
     /**
@@ -59,55 +72,51 @@ public class JSONQueryService {
     @POST
     @Path("/search")
     @Produces("application/json")
-    public Response postSearchJSON(Form form) {
-        MultivaluedMap<String, String> formParameters = form.asMap();
-        Map<String, String> parameters = prepareParameters(formParameters);
-        String queryType = parameters.get("queryType");
-        String json = parameters.get("json");
-        String finalJson = json;
+    public Response postSearchJson(Form form) {
+        MultivaluedMap<String, String> parameters = form.asMap();
+        // TODO: Add error handling if no JSON parameter is passed (null)
+        String json = parameters.getFirst("json");
 
-        //TODO: endpoint getItemByID -> return 1 JSON object
-        //TODO: endpoint count return -> count based on query params
-        //TODO: endpoint getItemsBasedOnParams -> return JSON objects based on query params
-        switch (queryType) {
-            case "value":
-                String column = parameters.get("queryColumn");
-                String value = parameters.get("queryColumnValue");
-                logger.debug("Querying JSON in column '{}' for value '{}'", column, value);
-                JsonElement element = JsonParser.parseString(json);
-                if (element.isJsonArray()) {
-                    logger.debug("Element is an array");
-                    JsonArray jsonArray = element.getAsJsonArray();
-                    JsonArray jsonResults = new JsonArray();
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        JsonElement currentElement = jsonArray.get(i);
-                        if (currentElement.isJsonObject()) {
-                            JsonObject currentObject = currentElement.getAsJsonObject();
-                            JsonElement foundValue = currentObject.get(column);
-                            if (foundValue != null) {
-                                if (foundValue.toString().equals(value)) {
-                                    jsonResults.add(currentObject);
-                                    logger.debug("Logging the result here {} ", jsonResults);
-                                }
-                            }
-                        }
-                    }
-                };
-
-
-                break;
-            case "count":
-                String columnTwo = parameters.get("queryColumn");
-                String valueTwo = parameters.get("queryColumnValue");
-                break;
-            case "all":
-            default:
-                break;
-        }
-
-
+        // Perform query with parameters
+        String finalJson = queryJson(json, parameters).toString();
 
         return Response.status(200).entity(finalJson).build();
+    }
+
+    /**
+     * Searches a given JSON string with a provided map of query parameters and returns a JsonArray of matching results.
+     * @param json The String JSON element.
+     * @param multivaluedParameters The MultivaluedMap of query parameters to search with.
+     * @return A JsonArray containing the results of the query.
+     */
+    private JsonArray queryJson(String json, MultivaluedMap<String, String> multivaluedParameters) {
+        Map<String, String> parameters = prepareParameters(multivaluedParameters);
+        JsonArray results = new JsonArray();
+        String column1 = parameters.get("column1");
+        String value1 = parameters.get("value1");
+
+        logger.debug("Querying JSON in column '{}' for value '{}'", column1, value1);
+        JsonElement element = JsonParser.parseString(json);
+        if (element.isJsonArray()) {
+            logger.debug("Element is an array");
+            JsonArray jsonArray = element.getAsJsonArray();
+            // Retrieve every JSON element from the JSON array
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonElement currentElement = jsonArray.get(i);
+                if (currentElement.isJsonObject()) {
+                    JsonObject currentObject = currentElement.getAsJsonObject();
+                    JsonElement foundValue = currentObject.get(column1);
+                    if (foundValue != null) {
+                        if (foundValue.toString().equals(value1)) {
+                            results.add(currentObject);
+                        }
+                    }
+                }
+            }
+        }
+
+        logger.debug("Logging the result here {} ", results);
+        return results;
     }
 
     /**
@@ -122,6 +131,5 @@ public class JSONQueryService {
         }
         return parameters;
     }
-
 
 }
