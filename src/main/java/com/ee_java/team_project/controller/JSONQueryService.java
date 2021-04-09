@@ -7,12 +7,10 @@ import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.io.StringReader;
-import com.google.gson.stream.JsonReader;
-import org.graalvm.compiler.nodes.memory.MemoryCheckpoint;
-
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.*;
 import java.util.HashMap;
 import java.util.Map;
