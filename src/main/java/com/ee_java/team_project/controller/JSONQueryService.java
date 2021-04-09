@@ -20,17 +20,34 @@ import java.util.Map;
  * Creates a JSON query endpoint that can handle POST requests consisting of query parameters to organize the JSON.
  * @author pjcraig
  */
-@Path("/elements")
+@Path("/jsonqueryservice")
 public class JSONQueryService {
     private static final Logger logger = LogManager.getLogger();
 
     /**
-     * Performs a JSON query using the session's stored JSON from parsing a CSV file.
+     * Returns the number of elements found from performing a GET JSON query.
      * @param uriInfo The URI info that contains query parameters to search with.
      * @return The response containing the queried JSON element.
      */
-    public Response getQueryJSON(@Context UriInfo uriInfo) {
-        return Response.status(200).build();
+    @GET
+    @Path("/count")
+    @Produces("application/json")
+    public Response getCountJSON(@Context UriInfo uriInfo) {
+        String json = "{\"count\": 0}";
+        return Response.status(200).entity(json).build();
+    }
+
+    /**
+     * Returns a JSON array response containing the JSON elements found from performing a GET JSON query.
+     * @param uriInfo The URI info that contains query parameters to search with.
+     * @return The response containing the queried JSON element.
+     */
+    @GET
+    @Path("/search")
+    @Produces("application/json")
+    public Response getSearchJSON(@Context UriInfo uriInfo) {
+        String json = "[]";
+        return Response.status(200).entity(json).build();
     }
     
     /**
@@ -40,8 +57,9 @@ public class JSONQueryService {
      * @return The response
      */
     @POST
+    @Path("/search")
     @Produces("application/json")
-    public Response queryJSON(Form form) {
+    public Response postSearchJSON(Form form) {
         MultivaluedMap<String, String> formParameters = form.asMap();
         Map<String, String> parameters = prepareParameters(formParameters);
         String queryType = parameters.get("queryType");
