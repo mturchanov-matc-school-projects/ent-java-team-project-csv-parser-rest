@@ -24,3 +24,11 @@ Tasks Completed:
 * Add feedback messages for users based on upload status
 * Add page to select endpoint for processing JSON
 * Add JavaScript form styling for HTML file input labels
+
+4/7/2021 ~ 7 hours
+* Flesh out endpoints.jsp plan
+* Implement basic access to API endpoints through endpoints.jsp
+* Add JSONQueryService endpoint for formal use
+* Add get all query
+* Begin implementing get by column value query
+* Add basic documentation page
