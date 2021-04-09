@@ -20,7 +20,7 @@ import java.util.Map;
  * Creates a JSON query endpoint that can handle POST requests consisting of query parameters to organize the JSON.
  * @author pjcraig
  */
-@Path("/query")
+@Path("/elements")
 public class JSONQueryService {
     private static final Logger logger = LogManager.getLogger();
     
