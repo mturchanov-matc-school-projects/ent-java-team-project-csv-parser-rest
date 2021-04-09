@@ -1,9 +1,6 @@
 package com.ee_java.team_project.controller;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,6 +58,7 @@ public class JSONQueryService {
         HttpSession session = request.getSession();
 
         String json = (String)session.getAttribute("json");
+        logger.debug(json);
 
         String finalJson = queryJson(json, parameters).toString();
 
@@ -82,7 +80,7 @@ public class JSONQueryService {
         if (parameters == null) {
             logger.error("no parameter, its null!");
         }
-        String json = parameters.getFirst("json");
+        String json = parameters.getFirst("dfjklghdfsugisdfojgsd;jgsdfl;");
 
         // Perform query with parameters
         String finalJson = queryJson(json, parameters).toString();
@@ -97,12 +95,22 @@ public class JSONQueryService {
      * @return A JsonArray containing the results of the query.
      */
     private JsonArray queryJson(String json, MultivaluedMap<String, String> multivaluedParameters) {
-        Map<String, String> parameters = prepareParameters(multivaluedParameters);
+        Map<String, String> initialParameters = prepareParameters(multivaluedParameters);
         JsonArray results = new JsonArray();
-        String column1 = parameters.get("column1");
-        String value1 = parameters.get("value1");
 
-        logger.debug("Querying JSON in column '{}' for value '{}'", column1, value1);
+        Map<String, String> parameters = new HashMap<>(initialParameters);
+
+        // remove empty queryParam
+        for (Map.Entry<String,String> param : initialParameters.entrySet()) {
+            //System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
+            String queryVal = param.getValue();
+            if (queryVal.isEmpty()) {
+                parameters.remove(param.getKey());
+            }
+        }
+
+        logger.debug("New Parameters: {}", parameters);
+
         JsonElement element = JsonParser.parseString(json);
         if (element.isJsonArray()) {
             logger.debug("Element is an array");
@@ -112,11 +120,22 @@ public class JSONQueryService {
                 JsonElement currentElement = jsonArray.get(i);
                 if (currentElement.isJsonObject()) {
                     JsonObject currentObject = currentElement.getAsJsonObject();
-                    JsonElement foundValue = currentObject.get(column1);
-                    if (foundValue != null) {
-                        if (foundValue.toString().equals(value1)) {
-                            results.add(currentObject);
+
+                    boolean allMatches = true;
+                    for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                        String column = entry.getKey();
+                        String value = entry.getValue();
+                        if (currentObject.has(column)) {
+                            String foundValue = currentObject.get(column).toString();
+                            foundValue = foundValue.replaceAll("^\"|\"$", "");
+                            logger.debug("Comparing value '{}' to '{}' in column '{}'", value, foundValue, column);
+                            if (!foundValue.equals(value)) {
+                                allMatches = false;
+                            }
                         }
+                    }
+                    if (allMatches) {
+                        results.add(currentObject);
                     }
                 }
             }
