@@ -1,9 +1,11 @@
 package com.ee_java.team_project.csv_parser;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import com.jayway.jsonpath.JsonPath;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -31,27 +33,30 @@ public class Test {
     //TODO: endpoint getItemByID -> return 1 JSON object
     //TODO: endpoint count return -> count based on query params
     //TODO: endpoint getItemsBasedOnParams -> return JSON objects based on query params
-    public Response test(@Context UriInfo uriInfo) {
+    public Response test(@Context UriInfo uriInfo, @Context HttpServletRequest httpRequest) {
         CodingCompCsvUtil parser = new CodingCompCsvUtil();
-        Map<List<String>, String> parsed = parser.readCsvFileFileWithoutPojo("/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/claims.csv");
-        String parsedItemsRawJSON = null;
-        List<String> keys;
-        for (Map.Entry<List<String>, String> entry : parsed.entrySet()) { // parse once to init
-            keys = entry.getKey();
-            parsedItemsRawJSON = entry.getValue();
-        }
-
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(); //gets all queryPArams(url?p=v&etc)
         Map<String, String> map = prepareParameters(queryParams);
+        Map<String, String> copyMap = new HashMap<>(map); //to avoid concurrent exception
 
+        HttpSession session = httpRequest.getSession();
+        String json = (String)session.getAttribute("json");
 
+        // remove empty queryParam
         for (Map.Entry<String,String> param : map.entrySet()) {
-            //TODO: parse through query params. if param is on of the #keys
-            // then filter #parsedItemsRawJSON (either by making it JSON and parsing or another way)
-            // TODO/extra: handling numeric comparison (e.g: query param #idLessThan=100 then filter and leave ids < 100)
-            System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
+            //System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
+            String queryVal = param.getValue();
+            if (queryVal.isEmpty()) {
+                copyMap.remove(param.getKey());
+            }
         }
-        return Response.status(200).entity(parsedItemsRawJSON).build();
+
+        for (Map.Entry<String,String> param : copyMap.entrySet()) {
+            List<String> updatedJson = (JsonPath.read(json, String.format("$.[?(@.%s == '%s')]", param.getKey(), param.getValue())));
+            json = updatedJson.toString();
+        }
+
+        return Response.status(200).entity(json).build();
     }
 
     private Map<String,String> prepareParameters(MultivaluedMap<String, String> queryParameters) {

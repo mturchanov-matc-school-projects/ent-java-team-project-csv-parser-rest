@@ -35,6 +35,9 @@ public class JSONQueryService {
     public Response queryJSON(Form form) {
         MultivaluedMap<String, String> formParameters = form.asMap();
         Map<String, String> parameters = prepareParameters(formParameters);
+        for(Map.Entry<String, String> entry : parameters.entrySet()) {
+            System.out.printf("%s:%s%n", entry.getKey(), entry.getValue());
+        }
         String queryType = parameters.get("queryType");
         String json = parameters.get("json");
         String finalJson = json;
@@ -77,9 +80,6 @@ public class JSONQueryService {
             default:
                 break;
         }
-
-
-
         return Response.status(200).entity(finalJson).build();
     }
 //

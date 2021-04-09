@@ -49,6 +49,42 @@
             </div>
         </form>
     </div>
+
+    <hr>
+    <br><br><br>
+    <hr>
+    <h2>count</h2>
+    <form action="rest/parsed_items">
+        <c:forEach var="column" items="${columns}">
+            <label for="${column}">${column}</label>
+            <input type="text" id="${column}" name="${column}">
+            <br>
+        </c:forEach>
+        <br>
+        <input type="submit" value="Ok">
+    </form>
+
+    <br>
+    <hr>
+    <h2>by id</h2>
+    <form action="rest/parsed_items">
+            <label for="item_id">item_id</label><br>
+            <input type="number" id="item_id" name="item_id">
+        <br>
+        <input type="submit" value="Ok">
+    </form>
+    <br>
+    <hr>
+    <h2>getItemsByParam</h2>
+    <form action="rest/parsed_items">
+            <c:forEach var="column" items="${columns}">
+                <label for="${column}">${column}</label>
+                <input type="text" id="${column}" name="${column}">
+                <br>
+            </c:forEach>
+        <br>
+        <input type="submit" value="Ok">
+    </form>
 </body>
 <c:import url="templates/scripts.jsp"></c:import>
 </html>

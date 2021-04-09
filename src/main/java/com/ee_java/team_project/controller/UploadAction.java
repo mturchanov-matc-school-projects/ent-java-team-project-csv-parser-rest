@@ -4,10 +4,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import javax.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
 import java.security.Security;
@@ -74,6 +71,9 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      * @throws IOException Whether or not an IO exception occurs.
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+
+
         String url = "/index.jsp";
         String feedback = "Failed to upload the file. Please try again later.";
         String path = writeUploadedFiles(request.getParts());
@@ -87,6 +87,9 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
             Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
             List<String> columns = entry.getKey();
             String rawJson = entry.getValue();
+
+            HttpSession session = request.getSession();
+            session.setAttribute("json", rawJson);;
 
             request.setAttribute("columns", columns);
             request.setAttribute("json", rawJson);
