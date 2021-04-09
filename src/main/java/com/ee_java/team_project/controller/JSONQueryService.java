@@ -109,21 +109,6 @@ public class JSONQueryService {
 
         return Response.status(200).entity(finalJson).build();
     }
-//
-//    public String parseJson(String json, String column) throws IOException {
-//        StringReader reader = new StringReader(json);
-//        JsonReader jsonReader = new JsonReader(reader);
-//
-//        //Iterate through json
-//        while (jsonReader.hasNext()) {
-//            String propertyName = jsonReader.nextName();
-//            if(propertyName.equals(column)) {
-//
-//            }
-//        }
-//        String returnedJson = " ";
-//        return returnedJson;
-//    }
 
     /**
      * Converts a multivalued map of parameters into a single-valued map.
