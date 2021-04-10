@@ -140,15 +140,35 @@ public class JSONQueryService {
                                 String column = entry.getKey();
                                 String value = entry.getValue();
 
-                                logger.debug("Querying for column {} in {}", column, currentObject);
+                                //logger.debug("Querying for column {} in {}", column, currentObject);
                                 // Verify that the given column exists on the object as a property
                                 if (currentObject.has(column)) {
                                     String foundValue = currentObject.get(column).toString().replaceAll("^\"|\"$", "");
-                                    logger.debug("Comparing value {} to expected value {}", foundValue, value);
+                                    //logger.debug("Comparing value {} to expected value {}", foundValue, value);
                                     // Break out of loop if a single value does not match
-                                    if (!foundValue.equals(value)) {
-                                        allMatches = false;
-                                        break;
+                                    if (value.matches("(^>[0-9]+$)|(^[0-9]+<$)")) {
+                                        // Greater than search initiated
+                                        value = value.replaceAll("^>|<$", "");
+                                        int foundValueInt = Integer.parseInt(foundValue);
+                                        int valueInt = Integer.parseInt(value);
+                                        if (foundValueInt <= valueInt) {
+                                            logger.debug("if found value is greater than valueInt + valueInt {} {}", foundValueInt, valueInt);
+                                            allMatches = false;
+                                            break;
+                                        }
+                                    } else if (value.matches("(^<[0-9]+$)|(^[0-9]+>$)")) {
+                                        value = value.replaceAll("^<|>$", "");
+                                        int foundValueInt = Integer.parseInt(foundValue);
+                                        int valueInt = Integer.parseInt(value);
+                                        // Less than search initiated
+                                        if (foundValueInt >= valueInt) {
+                                            logger.debug("if found value is less than valueInt + valueInt {} {}", foundValueInt, valueInt);
+                                            allMatches = false;
+                                            break;
+                                        }
+                                    } else if (!foundValue.equals(value)) {
+                                            allMatches = false;
+                                            break;
                                     }
                                 }
                             }
