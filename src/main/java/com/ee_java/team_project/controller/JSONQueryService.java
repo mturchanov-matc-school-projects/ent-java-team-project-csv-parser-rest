@@ -120,6 +120,8 @@ public class JSONQueryService {
                 }
             }
 
+            logger.debug("Searching JSON with parameters {}", parametersCopy);
+
             // Attempt to parse provided JSON element as JSON
             try {
                 JsonElement element = JsonParser.parseString(json);
@@ -138,10 +140,11 @@ public class JSONQueryService {
                                 String column = entry.getKey();
                                 String value = entry.getValue();
 
+                                logger.debug("Querying for column {} in {}", column, currentObject);
                                 // Verify that the given column exists on the object as a property
                                 if (currentObject.has(column)) {
-                                    String foundValue = currentObject.get(column).toString();
-                                    foundValue = foundValue.replaceAll("^\"|\"$", "");
+                                    String foundValue = currentObject.get(column).toString().replaceAll("^\"|\"$", "");
+                                    logger.debug("Comparing value {} to expected value {}", foundValue, value);
                                     // Break out of loop if a single value does not match
                                     if (!foundValue.equals(value)) {
                                         allMatches = false;
