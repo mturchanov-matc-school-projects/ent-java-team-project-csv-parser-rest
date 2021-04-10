@@ -31,10 +31,9 @@ public class JSONQueryService {
     @Produces("application/json")
     public Response getCountJson(@Context UriInfo uriInfo, @Context HttpServletRequest request) {
         Map<String, String> parameters = prepareParameters(uriInfo.getQueryParameters());
-        // TODO: Get JSON from session attribute
         HttpSession session = request.getSession();
 
-        String json = (String)session.getAttribute("json");
+        String json = (String) session.getAttribute("json");
 
         int count = queryJson(json, parameters).size();
         String finalJson = String.format("{\"count\": %d}", count);
@@ -52,11 +51,9 @@ public class JSONQueryService {
     @Produces("application/json")
     public Response getSearchJson(@Context UriInfo uriInfo, @Context HttpServletRequest request) {
         Map<String, String> parameters = prepareParameters(uriInfo.getQueryParameters());
-        // TODO: Get JSON from session attribute
         HttpSession session = request.getSession();
 
-        String json = (String)session.getAttribute("json");
-        logger.debug(json);
+        String json = (String) session.getAttribute("json");
 
         String finalJson = queryJson(json, parameters).toString();
 
@@ -64,8 +61,28 @@ public class JSONQueryService {
     }
 
     /**
+     * Returns the number of elements found from performing a POST JSON query.
+     * @param body The body content of the POST request.
+     * @return The response containing the number of resulting JSON elements from the query.
+     */
+    @POST
+    @Path("/count")
+    @Produces("application/json")
+    public Response postCountJson(String body) {
+        Map<String, String> bodyParameters = processPostBody(body);
+        String rawJson = bodyParameters.get("json");
+        String queryDataJson = bodyParameters.get("search");
+        Map<String, String> queryParameters = processQueryParameters(queryDataJson);
+
+        int count = queryJson(rawJson, queryParameters).size();
+        String finalJson = String.format("{\"count\": %d}", count);
+
+        return Response.status(200).entity(finalJson).build();
+    }
+
+    /**
      * Returns JSON elements based on the JSON to filter and a list of columns and values to compare.
-     * @param body The POST request body content.
+     * @param body The body content of the POST request.
      * @return The response containing the queried JSON element.
      */
     @POST
@@ -93,48 +110,55 @@ public class JSONQueryService {
 
         Map<String, String> parametersCopy = new HashMap<>(parameters);
 
-        // remove empty queryParam
+        // Remove empty query parameters
         for (Map.Entry<String,String> param : parameters.entrySet()) {
-            //System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
             String queryVal = param.getValue();
             if (queryVal.isEmpty()) {
                 parametersCopy.remove(param.getKey());
             }
         }
 
-        logger.debug("New Parameters: {}", parametersCopy);
+        // Attempt to parse provided JSON element as JSON
+        try {
+            JsonElement element = JsonParser.parseString(json);
+            if (element.isJsonArray()) {
+                JsonArray jsonArray = element.getAsJsonArray();
+                // Retrieve every JSON element from the JSON array
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonElement currentElement = jsonArray.get(i);
 
-        JsonElement element = JsonParser.parseString(json);
-        if (element.isJsonArray()) {
-            JsonArray jsonArray = element.getAsJsonArray();
-            // Retrieve every JSON element from the JSON array
-            for (int i = 0; i < jsonArray.size(); i++) {
-                JsonElement currentElement = jsonArray.get(i);
-                if (currentElement.isJsonObject()) {
-                    JsonObject currentObject = currentElement.getAsJsonObject();
+                    if (currentElement.isJsonObject()) {
+                        JsonObject currentObject = currentElement.getAsJsonObject();
 
-                    boolean allMatches = true;
-                    for (Map.Entry<String, String> entry : parametersCopy.entrySet()) {
-                        String column = entry.getKey();
-                        String value = entry.getValue();
-                        logger.debug("Looking for column '{}' in {}", column, currentObject);
-                        if (currentObject.has(column)) {
-                            String foundValue = currentObject.get(column).toString();
-                            foundValue = foundValue.replaceAll("^\"|\"$", "");
-                            logger.debug("Comparing value '{}' to '{}' in column '{}'", value, foundValue, column);
-                            if (!foundValue.equals(value)) {
-                                allMatches = false;
+                        // Add JSON object if all properties match
+                        boolean allMatches = true;
+                        for (Map.Entry<String, String> entry : parametersCopy.entrySet()) {
+                            String column = entry.getKey();
+                            String value = entry.getValue();
+
+                            // Verify that the given column exists on the object as a property
+                            if (currentObject.has(column)) {
+                                String foundValue = currentObject.get(column).toString();
+                                foundValue = foundValue.replaceAll("^\"|\"$", "");
+                                // Break out of loop if a single value does not match
+                                if (!foundValue.equals(value)) {
+                                    allMatches = false;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (allMatches) {
-                        results.add(currentObject);
+                        if (allMatches) {
+                            results.add(currentObject);
+                        }
                     }
                 }
             }
+        } catch (JsonParseException exception) {
+            logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
+        } catch (Exception exception) {
+            logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
         }
 
-        logger.debug("Logging the result here {} ", results);
         return results;
     }
 
@@ -193,27 +217,6 @@ public class JSONQueryService {
             parameters.put(str, queryParameters.getFirst(str));
         }
         return parameters;
-    }
-
-    /**
-     * Converts a list of key strings and a list of value strings into a map of string keys and values. If there are
-     * more keys than values, an empty string is substituted in. If there are more values than keys, only the keys that
-     * exist are mapped.
-     * @param keys The list of key strings.
-     * @param values The list of value strings.
-     * @return The map of string keys and values from both associated lists.
-     */
-    private Map<String, String> mapLists(List<String> keys, List<String> values) {
-        Map<String, String> map = new HashMap<>();
-        for (int index = 0; index < keys.size(); index++) {
-            String key = keys.get(index);
-            String value = "";
-            if (index < values.size()) {
-                value = values.get(index);
-            }
-            map.put(key, value);
-        }
-        return map;
     }
 
 }
