@@ -9,50 +9,29 @@ const fileInputChanged = event => {
 }
 
 /*
-* Hides all fields that can depend on the query type.
+* Changes JSON query form action to count if the count checkbox has been checked
 */
-const hideAllVariableFields = () => {
-    let queryColumnGroup = document.querySelector("#queryColumnGroup");
-    queryColumnGroup.hidden = true;
-}
+const countResultsChanged = event => {
+    let element = event.target;
 
-/*
-* Updates fields to be hidden or shown based on the provided query type.
-*/
-const updateHiddenFields = queryType => {
     let queryForm = document.querySelector("#queryForm");
-    let queryColumnGroup = document.querySelector("#queryColumnGroup");
-    hideAllVariableFields();
-    switch (queryType) {
-        case "count":
-            queryForm.setAttribute("action", "rest/jsonqueryservice/count");
-            break;
-        case "search":
-        default:
-            queryForm.setAttribute("action", "rest/jsonqueryservice/search");
-            queryColumnGroup.hidden = false;
-            break;
+    if (element.checked) {
+        queryForm.setAttribute("action", "rest/jsonqueryservice/count");
+    } else {
+        queryForm.setAttribute("action", "rest/jsonqueryservice/search");
     }
 }
 
 /*
-* Update fields that hide or show themselves based on query type when the type is changed.
-*/
-const queryTypeChanged = event => {
-    updateHiddenFields(event.target.value);
-}
-
-/*
-* Initialize form styling event listeners and variable display input groups
+* Initialize dynamic form styling event listeners.
 */
 const formStyleInit = () => {
     let fileInputElement = document.querySelector("#fileInput");
     if (fileInputElement) fileInputElement.addEventListener("change", fileInputChanged);
 
-    let querySelectElement = document.querySelector("#queryTypeInput");
-    if (querySelectElement) {
-        querySelectElement.addEventListener("change", queryTypeChanged);
-        updateHiddenFields(querySelectElement.value);
+    let countResultsInput = document.querySelector("#countResults");
+    if (countResultsInput) {
+        countResultsInput.addEventListener("change", countResultsChanged);
     }
 }
 

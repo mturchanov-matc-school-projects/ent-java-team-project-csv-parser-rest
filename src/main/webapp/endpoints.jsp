@@ -14,29 +14,24 @@
             </c:when>
         </c:choose>
 
-        <form id="queryForm" action="" method="get">
+        <form id="queryForm" action="rest/jsonqueryservice/search" method="get">
             <div class="form-group">
                 <label for="jsonTextArea">Parsed JSON</label>
                 <textarea id="jsonTextArea" class="form-control" readonly>${json}</textarea>
             </div>
 
-            <div class="form-group">
-                <label for="queryTypeInput">JSON Filter</label>
-                <select id="queryTypeInput" class="form-control">
-                    <option value="count">Get Count</option>
-                    <option value="search">Search Column(s)</option>
-                </select>
-            </div>
+            <p>Enter Values to Search</p>
 
-            <div id="queryColumnGroup">
-                <p>Enter Values to Search</p>
+            <c:forEach var="column" items="${columns}">
+                <div class="form-group">
+                    <label for="${column}">${column}</label>
+                    <input type="text" id="${column}" name="${column}" class="form-control">
+                </div>
+            </c:forEach>
 
-                <c:forEach var="column" items="${columns}">
-                    <div class="form-group">
-                        <label for="${column}">${column}</label>
-                        <input type="text" id="${column}" name="${column}" class="form-control">
-                    </div>
-                </c:forEach>
+            <div class="form-check">
+                <input id="countResults" type="checkbox" class="form-check-input">
+                <label for="countResults" class="form-check-label">Count Results</label>
             </div>
 
             <input type="submit" class="btn btn-primary">
