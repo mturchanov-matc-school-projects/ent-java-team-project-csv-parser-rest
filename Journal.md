@@ -32,3 +32,16 @@ Tasks Completed:
 * Add get all query
 * Begin implementing get by column value query
 * Add basic documentation page
+
+4/8/2021 ~ 1.5 hours
+* Met and discussed plans for handling endpoint requests and project design
+
+4/9/2021 ~ 10 hours
+* Add JSON querying using Gson
+* Experimented with JSON querying system using JsonPath API
+* Redesigned endpoints.jsp for clarity and conciseness
+* Updated form styling JavaScript to handle new endpoints.jsp design
+* Stored parsed JSON into session attribute for processing in GET requests to endpoints
+* Removed old Test endpoint
+* Add POST endpoints for non-web based JSON filtering by POSTing data in request body
+* Add methods to parse and process POST body data and convert it into usable data
