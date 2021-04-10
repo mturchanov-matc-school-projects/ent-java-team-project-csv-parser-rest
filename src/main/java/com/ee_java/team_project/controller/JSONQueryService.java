@@ -37,60 +37,40 @@ public class JSONQueryService {
     @Path("/count")
     @Produces("application/json")
     public Response getCountJson(@Context UriInfo uriInfo, @Context HttpServletRequest request) {
-        MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
-        // TODO: Get JSON from session attribute
-        HttpSession session = request.getSession();
-        String json = (String)session.getAttribute("json");
-        Map<String, String> finalParams = prepareParameters(parameters);
-        for (Map.Entry<String, String> entry : finalParams.entrySet()) {
-            System.out.printf("%s:%s%n", entry.getKey(), entry.getValue());
-        }
-
-        int count = queryJson(json, parameters).size();
-        String finalJson = String.format("{\"count\": %d}", count);
-
-        return Response.status(200).entity(finalJson).build();
+        List<String> filteredJSON = filterJSON(uriInfo, request);
+        String finalCountJSON = String.format("{\"count\":%d}", filteredJSON.size());
+        return Response.status(200).entity(finalCountJSON).build();
     }
 
     /**
      * Returns a JSON array response containing the JSON elements found from performing a GET JSON query.
-     * @param uriInfo The URI info that contains query parameters to search with.
      * @return The response containing the queried JSON element.
      */
     @GET
     @Path("/search")
     @Produces("application/json")
     public Response getSearchJson(@Context UriInfo uriInfo, @Context HttpServletRequest request) {
+        List<String> filteredJSON = filterJSON(uriInfo, request);
+        System.out.println(filteredJSON);
+        System.out.println((filteredJSON.size()));
+        return Response.status(200).entity(filteredJSON.toString()).build();
+    }
+
+    private List<String> filterJSON(@Context UriInfo uriInfo, @Context HttpServletRequest request) {
         MultivaluedMap<String, String> parameters = uriInfo.getQueryParameters();
-
-        // TODO: Get JSON from session attribute
         HttpSession session = request.getSession();
-
         String json = (String)session.getAttribute("json");
 
         Map<String, String> map = prepareParameters(parameters);
-        Map<String, String> copyMap = new HashMap<>(map); //to avoid concurrent exception
-
-        // remove empty queryParam
+        List<String> updatedJson = null;
         for (Map.Entry<String,String> param : map.entrySet()) {
-            //System.out.printf("{%s:%s}%n", param.getKey(), param.getValue());
-            String queryVal = param.getValue();
-            if (queryVal.isEmpty()) {
-                copyMap.remove(param.getKey());
+            if (!param.getValue().isEmpty()) {
+                updatedJson = (JsonPath.read(json, String.format("$.[?(@.%s == '%s')]", param.getKey(), param.getValue())));
+                json = updatedJson.toString();
             }
         }
 
-
-        for (Map.Entry<String,String> param : copyMap.entrySet()) {
-            List<String> updatedJson = (JsonPath.read(json, String.format("$.[?(@.%s == '%s')]", param.getKey(), param.getValue())));
-            json = updatedJson.toString();
-        }
-
-        //String finalJson = queryJson(json, parameters).toString();
-        System.out.println(json);
-        //System.out.println(finalJson);
-
-        return Response.status(200).entity(json).build();
+        return updatedJson;
     }
     
     /**
@@ -116,7 +96,7 @@ public class JSONQueryService {
         System.out.println(finalJson);
 
 
-        return Response.status(200).entity(finalJson).build();
+        return Response.status(200).entity(finalJson.toString()).build();
     }
 
     /**

@@ -1,3 +1,6 @@
+/*
+* Updates the label associated with the provided for a
+*/
 const fileInputChanged = event => {
     let element = event.target;
     let label = document.querySelector("#fileInputLabel");
@@ -5,36 +8,30 @@ const fileInputChanged = event => {
     label.textContent = fileName;
 }
 
-const hideAllVariableFields = () => {
-    let queryColumnGroup = document.querySelector("#queryColumnGroup");
-    queryColumnGroup.hidden = true;
-}
+/*
+* Changes JSON query form action to count if the count checkbox has been checked
+*/
+const countResultsChanged = event => {
+    let element = event.target;
 
-const updateHiddenFields = queryType => {
-    let queryColumnGroup = document.querySelector("#queryColumnGroup");
-    hideAllVariableFields();
-    switch (queryType) {
-        case "value":
-            queryColumnGroup.hidden = false;
-            break;
-        case "all":
-        default:
-            break;
+    let queryForm = document.querySelector("#queryForm");
+    if (element.checked) {
+        queryForm.setAttribute("action", "rest/jsonqueryservice/count");
+    } else {
+        queryForm.setAttribute("action", "rest/jsonqueryservice/search");
     }
 }
 
-const queryTypeChanged = event => {
-    updateHiddenFields(event.target.value);
-}
-
+/*
+* Initialize dynamic form styling event listeners.
+*/
 const formStyleInit = () => {
     let fileInputElement = document.querySelector("#fileInput");
     if (fileInputElement) fileInputElement.addEventListener("change", fileInputChanged);
 
-    let querySelectElement = document.querySelector("#queryTypeInput");
-    if (querySelectElement) {
-        querySelectElement.addEventListener("change", queryTypeChanged);
-        updateHiddenFields(querySelectElement.value);
+    let countResultsInput = document.querySelector("#countResults");
+    if (countResultsInput) {
+        countResultsInput.addEventListener("change", countResultsChanged);
     }
 }
 
