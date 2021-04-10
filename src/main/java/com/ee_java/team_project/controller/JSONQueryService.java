@@ -108,55 +108,58 @@ public class JSONQueryService {
     private JsonArray queryJson(String json, Map<String, String> parameters) {
         JsonArray results = new JsonArray();
 
-        Map<String, String> parametersCopy = new HashMap<>(parameters);
+        // Verify that JSON data exists
+        if (json != null) {
+            Map<String, String> parametersCopy = new HashMap<>(parameters);
 
-        // Remove empty query parameters
-        for (Map.Entry<String,String> param : parameters.entrySet()) {
-            String queryVal = param.getValue();
-            if (queryVal.isEmpty()) {
-                parametersCopy.remove(param.getKey());
+            // Remove empty query parameters
+            for (Map.Entry<String,String> param : parameters.entrySet()) {
+                String queryVal = param.getValue();
+                if (queryVal.isEmpty()) {
+                    parametersCopy.remove(param.getKey());
+                }
             }
-        }
 
-        // Attempt to parse provided JSON element as JSON
-        try {
-            JsonElement element = JsonParser.parseString(json);
-            if (element.isJsonArray()) {
-                JsonArray jsonArray = element.getAsJsonArray();
-                // Retrieve every JSON element from the JSON array
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JsonElement currentElement = jsonArray.get(i);
+            // Attempt to parse provided JSON element as JSON
+            try {
+                JsonElement element = JsonParser.parseString(json);
+                if (element.isJsonArray()) {
+                    JsonArray jsonArray = element.getAsJsonArray();
+                    // Retrieve every JSON element from the JSON array
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        JsonElement currentElement = jsonArray.get(i);
 
-                    if (currentElement.isJsonObject()) {
-                        JsonObject currentObject = currentElement.getAsJsonObject();
+                        if (currentElement.isJsonObject()) {
+                            JsonObject currentObject = currentElement.getAsJsonObject();
 
-                        // Add JSON object if all properties match
-                        boolean allMatches = true;
-                        for (Map.Entry<String, String> entry : parametersCopy.entrySet()) {
-                            String column = entry.getKey();
-                            String value = entry.getValue();
+                            // Add JSON object if all properties match
+                            boolean allMatches = true;
+                            for (Map.Entry<String, String> entry : parametersCopy.entrySet()) {
+                                String column = entry.getKey();
+                                String value = entry.getValue();
 
-                            // Verify that the given column exists on the object as a property
-                            if (currentObject.has(column)) {
-                                String foundValue = currentObject.get(column).toString();
-                                foundValue = foundValue.replaceAll("^\"|\"$", "");
-                                // Break out of loop if a single value does not match
-                                if (!foundValue.equals(value)) {
-                                    allMatches = false;
-                                    break;
+                                // Verify that the given column exists on the object as a property
+                                if (currentObject.has(column)) {
+                                    String foundValue = currentObject.get(column).toString();
+                                    foundValue = foundValue.replaceAll("^\"|\"$", "");
+                                    // Break out of loop if a single value does not match
+                                    if (!foundValue.equals(value)) {
+                                        allMatches = false;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if (allMatches) {
-                            results.add(currentObject);
+                            if (allMatches) {
+                                results.add(currentObject);
+                            }
                         }
                     }
                 }
+            } catch (JsonParseException exception) {
+                logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
+            } catch (Exception exception) {
+                logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
             }
-        } catch (JsonParseException exception) {
-            logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
-        } catch (Exception exception) {
-            logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
         }
 
         return results;
