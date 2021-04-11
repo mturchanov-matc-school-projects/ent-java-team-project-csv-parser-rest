@@ -24,17 +24,7 @@ public class JsonFilter {
 
         // Verify that JSON data exists
         if (json != null) {
-            Map<String, String> parametersCopy = new HashMap<>(parameters);
-
-            // Remove empty query parameters
-            for (Map.Entry<String,String> param : parameters.entrySet()) {
-                String queryVal = param.getValue();
-                if (queryVal.isEmpty()) {
-                    parametersCopy.remove(param.getKey());
-                }
-            }
-
-            logger.debug("Searching JSON with parameters {}", parametersCopy);
+            Map<String, String> parametersCopy = removeEmptyParameters(parameters);
 
             // Attempt to parse provided JSON element as JSON
             try {
@@ -80,34 +70,55 @@ public class JsonFilter {
         return results;
     }
 
+    /**
+     * Creates a new parameters mapping without empty parameter values.
+     * @param parameters The initial parameters to parse.
+     * @return A new parameter mapping without empty-valued parameters.
+     */
+    private static Map<String, String> removeEmptyParameters(Map<String, String> parameters) {
+        Map<String, String> parametersCopy = new HashMap<>(parameters);
+        for (Map.Entry<String,String> param : parameters.entrySet()) {
+            String queryVal = param.getValue();
+            if (queryVal.isEmpty()) {
+                parametersCopy.remove(param.getKey());
+            }
+        }
+        return parametersCopy;
+    }
+
+    /**
+     * Compares the user-entered query to the actual value. The query search can contain numerical comparison operators
+     * such as >, >=, <, and <=. If no operator is specified, the values are compared exactly.
+     * @param querySearch The String query to search with.
+     * @param actualValue The actual value to compare against.
+     * @return Whether or not the query search compares to the actual value.
+     */
     private static boolean compareValue(String querySearch, String actualValue) {
         boolean matches;
         String queryValue = querySearch.replaceAll("(^<=?|>=?)|(<=?|>=?$)", "");
         String operator = querySearch.replaceAll("[0-9]+", "");
-        logger.debug("Query value: {}", queryValue);
-        logger.debug("Operator: {}", operator);
-        // Check if query value is greater than entered value
+        // Check if actual value is greater than entered value
         if (querySearch.matches("(^>[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if query value value is less than actual value
+            // Check if entered value is less than actual value
         } else if (querySearch.matches("(^[0-9]+<$)")) {
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if query value is greater than entered value
+            // Check if actual value is less than entered value
         } else if (querySearch.matches("(^<[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if query value is greater than entered value
+            // Check if entered value is greater than actual value
         } else if (querySearch.matches("(^[0-9]+>$)")) {
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if query value is greater than entered value
+            // Check if actual value is greater than or equal to entered value
         } else if (querySearch.matches("(^>=[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if query value is less than actual value
+            // Check if entered value is less than or equal to actual value
         } else if (querySearch.matches("(^[0-9]+<=$)")) {
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if query value is less than actual value
+            // Check if actual value is less than or equal to entered value
         } else if (querySearch.matches("(^<=[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if value exactly matches search query
+            // Check if entered value is greater than or equal to actual value
         } else if (querySearch.matches("(^[0-9]+>=$)")) {
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
             // Check if value exactly matches search query
@@ -117,6 +128,15 @@ public class JsonFilter {
         return matches;
     }
 
+    /**
+     * Compares two values against each other using a provided comparison operator. Valid operators are <, <=, >, and
+     * >=. The values being compared are converted to integers in the process of comparing and will return false if they
+     * cannot be converted.
+     * @param value1 The first value to compare.
+     * @param value2 The second value to compare.
+     * @param operator The operator to compare with (<, <=, >, >=).
+     * @return How the first value compares to the second value.
+     */
     private static boolean compareWithOperatorValue(String value1, String value2, String operator) {
         boolean result = false;
         try {
