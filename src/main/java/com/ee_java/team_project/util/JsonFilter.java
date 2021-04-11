@@ -36,7 +36,7 @@ public class JsonFilter {
                 }
             }
 
-            //logger.debug("Searching JSON with parameters {}", parametersCopy);
+            logger.debug("Searching JSON with parameters {}", parametersCopy);
 
             // Attempt to parse provided JSON element as JSON
             try {
@@ -90,9 +90,8 @@ public class JsonFilter {
             operator = "|";
         }
 
-
-        //logger.debug("Query value: {}", queryValue);
-        //logger.debug("Operator: {}", operator);
+        logger.debug("Query value: {}", queryValue);
+        logger.debug("Operator: {}", operator);
         // Check if query value is greater than entered value
         if (querySearch.matches("(^>[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);

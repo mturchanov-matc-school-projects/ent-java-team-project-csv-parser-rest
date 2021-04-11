@@ -65,8 +65,6 @@
                 ]
             </pre>
             </details>
-
-
         </div>
     </div>
 
@@ -130,9 +128,6 @@
             <pre>http://localhost:8080/csvparser/rest/jsonqueryservic/search?closed=false&monthsOpen=8</pre>
         </div>
     </div>
-
-
-
 </div>
 </body>
 <c:import url="templates/scripts.jsp"></c:import>
