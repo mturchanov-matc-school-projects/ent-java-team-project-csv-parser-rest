@@ -29,7 +29,7 @@
                 </div>
             </c:forEach>
 
-            <div class="form-check">
+            <div class="form-check pb-3">
                 <input id="countResults" type="checkbox" class="form-check-input">
                 <label for="countResults" class="form-check-label">Count Results</label>
             </div>
