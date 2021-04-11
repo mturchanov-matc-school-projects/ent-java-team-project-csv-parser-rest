@@ -26,17 +26,7 @@ public class JsonFilter {
 
         // Verify that JSON data exists
         if (json != null) {
-            Map<String, String> parametersCopy = new HashMap<>(parameters);
-
-            // Remove empty query parameters
-            for (Map.Entry<String,String> param : parameters.entrySet()) {
-                String queryVal = param.getValue();
-                if (queryVal.isEmpty()) {
-                    parametersCopy.remove(param.getKey());
-                }
-            }
-
-            logger.debug("Searching JSON with parameters {}", parametersCopy);
+            Map<String, String> parametersCopy = removeEmptyParameters(parameters);
 
             // Attempt to parse provided JSON element as JSON
             try {
@@ -82,74 +72,110 @@ public class JsonFilter {
         return results;
     }
 
+    /**
+     * Creates a new parameters mapping without empty parameter values.
+     * @param parameters The initial parameters to parse.
+     * @return A new parameter mapping without empty-valued parameters.
+     */
+    private static Map<String, String> removeEmptyParameters(Map<String, String> parameters) {
+        Map<String, String> parametersCopy = new HashMap<>(parameters);
+        for (Map.Entry<String,String> param : parameters.entrySet()) {
+            String queryVal = param.getValue();
+            if (queryVal.isEmpty()) {
+                parametersCopy.remove(param.getKey());
+            }
+        }
+        return parametersCopy;
+    }
+
+    /**
+     * Compares the user-entered query to the actual value. The query search can contain numerical comparison operators
+     * such as >, >=, <, and <=. If no operator is specified, the values are compared exactly.
+     * @param querySearch The user-entered query to search with.
+     * @param actualValue The actual value to compare against.
+     * @return Whether or not the query search compares to the actual value.
+     */
     private static boolean compareValue(String querySearch, String actualValue) {
         boolean matches;
-        String queryValue = querySearch.replaceAll("(^<=?|>=?)|(<=?|>=?$)", "");
-        String operator = querySearch.replaceAll("[0-9]+", "");
-        if (querySearch.contains("|")) {
-            operator = "|";
+        String operator = "=";
+
+        // Check if entered value is not equal to actual value
+        if (querySearch.contains("!=")) {
+            operator = "!=";
+            String queryValue = querySearch.replaceAll("!=", "");
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
+
+            // Check if actual value contains any of the values from the entered query search (OR operator)
+        } else if (querySearch.contains("|")) {
+            String[] values = querySearch.split("\\|");
+            matches = false;
+
+            // Perform comparison for every entered value of or operator
+            for (int index = 0; index < values.length; index++) {
+                String value = values[index].trim();
+
+                // Verify that value is not empty
+                if (!value.equals("")) {
+                    matches = compareWithOperatorValue(value, actualValue, operator);
+
+                    // Break out of loop when at least one expected value matches actual value
+                    if (matches) {
+                        break;
+                    }
+                }
+            }
+
+            // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
+        } else if (querySearch.matches("[><]=?[0-9]+")) {
+            String queryValue = querySearch.replaceAll("[><]=?", "");
+            operator = querySearch.replaceAll("[0-9]+", "");
+            matches = compareWithOperatorValue(actualValue, queryValue, operator);
+
+        } else {
+            matches = compareWithOperatorValue(actualValue, querySearch, operator);
         }
 
-        logger.debug("Query value: {}", queryValue);
-        logger.debug("Operator: {}", operator);
-        // Check if query value is greater than entered value
-        if (querySearch.matches("(^>[0-9]+$)")) {
-            matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if query value value is less than actual value
-        } else if (querySearch.matches("(^[0-9]+<$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if query value is greater than entered value
-        } else if (querySearch.matches("(^<[0-9]+$)")) {
-            matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if query value is greater than entered value
-        } else if (querySearch.matches("(^[0-9]+>$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if query value is greater than entered value
-        } else if (querySearch.matches("(^>=[0-9]+$)")) {
-            matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if query value is less than actual value
-        } else if (querySearch.matches("(^[0-9]+<=$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if query value is less than actual value
-        } else if (querySearch.matches("(^<=[0-9]+$)")) {
-            matches = compareWithOperatorValue(actualValue, queryValue, operator);
-            // Check if value exactly matches search query
-        } else if (querySearch.matches("(^[0-9]+>=$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if value contains in entered input
-        } else if (querySearch.contains("|")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-            // Check if value exactly matches search query
-        } else {
-            matches = (querySearch.equals(actualValue));
-        }
         return matches;
     }
 
+    /**
+     * Compares two values against each other using a provided comparison operator. Valid operators are <, <=, >, >=, =,
+     * and !=. Numeric comparison operators convert String values to integers and will return false if they cannot be
+     * converted.
+     * @param value1 The first value to compare.
+     * @param value2 The second value to compare.
+     * @param operator The operator to compare with (<, <=, >, >=).
+     * @return How the first value compares to the second value.
+     */
     private static boolean compareWithOperatorValue(String value1, String value2, String operator) {
         boolean result = false;
-        //if OR operator then check if contains and out
-        if (operator.equals("|")) {
-            return value1.contains(value2);
+        // If NOT EQUAL operator then
+        if (operator.equals("!=")) {
+            result = !value1.equals(value2);
+            // If equals operator then check if contains value
+        } else if (operator.equals("=")) {
+            result = value1.equals(value2);
+        } else {
+            // Compare using numeric operators
+            try {
+                int number1 = Integer.parseInt(value1);
+                int number2 = Integer.parseInt(value2);
+                if (operator.equals(">")) {
+                    result = number1 > number2;
+                } else if (operator.equals("<")) {
+                    result = number1 < number2;
+                } else if (operator.equals(">=")) {
+                    result = number1 >= number2;
+                } else if (operator.equals("<=")) {
+                    result = number1 <= number2;
+                }
+            } catch (NumberFormatException exception) {
+                logger.error("Invalid value provided while converting to integer!", exception);
+            } catch (Exception exception) {
+                logger.error("Unknown exception occurred while parsing values to integer!", exception);
+            }
         }
 
-        try {
-            int number1 = Integer.parseInt(value1);
-            int number2 = Integer.parseInt(value2);
-            if (operator.equals(">")) {
-                result = (number1 > number2);
-            } else if (operator.equals("<")) {
-                result = (number1 < number2);
-            } else if (operator.equals(">=")) {
-                result = (number1 >= number2);
-            } else if (operator.equals("<=")) {
-                result = (number1 <= number2);
-            }
-        } catch (NumberFormatException exception) {
-            logger.error("Invalid value provided while converting to integer!", exception);
-        } catch (Exception exception) {
-            logger.error("Unknown exception occurred while parsing values to integer!", exception);
-        }
         return result;
     }
 

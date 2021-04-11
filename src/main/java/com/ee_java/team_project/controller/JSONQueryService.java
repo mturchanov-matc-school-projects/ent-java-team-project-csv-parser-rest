@@ -1,18 +1,21 @@
 package com.ee_java.team_project.controller;
 
+import com.ee_java.team_project.csv_parser.CodingCompCsvUtil;
+import com.ee_java.team_project.util.CSVFileWriter;
 import com.ee_java.team_project.util.JsonFilter;
 import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * Creates a JSON query endpoint that can handle POST requests consisting of query parameters to organize the JSON.
@@ -63,61 +66,81 @@ public class JSONQueryService {
 
     /**
      * Returns the number of elements found from performing a POST JSON query.
-     * @param body The body content of the POST request.
+     * @param file The CSV file.
+     * @param jsonSearchFilter The JSON object containing column filters.
      * @return The response containing the number of resulting JSON elements from the query.
      */
     @POST
     @Path("/count")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response postCountJson(String body) {
-        Map<String, String> bodyParameters = processPostBody(body);
-        String rawJson = bodyParameters.get("csv");
-        String queryDataJson = bodyParameters.get("search");
-        Map<String, String> queryParameters = processQueryParameters(queryDataJson);
+    public Response postCountJson(@FormDataParam("file") File file, @FormDataParam("search") String jsonSearchFilter) {
 
-        int count = JsonFilter.queryJson(rawJson, queryParameters).size();
-        String finalJson = String.format("{\"count\": %d}", count);
+        // Write file to disk
+        CSVFileWriter writer = new CSVFileWriter();
+        String path = writer.write(file);
 
-        return Response.status(200).entity(finalJson).build();
+        // Verify that the file was written successfully
+        if (path != null) {
+            int count = processCSVFilter(path, jsonSearchFilter).size();
+            String finalJson = String.format("{\"count\":%d}", count);
+
+            // Remove uploaded file when done
+            writer.delete(path);
+
+            return Response.status(200).entity(finalJson).build();
+        }
+
+        return Response.serverError().build();
     }
 
     /**
      * Returns JSON elements based on the JSON to filter and a list of columns and values to compare.
-     * @param body The body content of the POST request.
+     * @param file The CSV file.
+     * @param jsonSearchFilter The JSON object containing column filters.
      * @return The response containing the queried JSON element.
      */
     @POST
     @Path("/search")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response postSearchJson(String body) {
-        Map<String, String> bodyParameters = processPostBody(body);
-        String rawJson = bodyParameters.get("csv");
-        String queryDataJson = bodyParameters.get("search");
-        Map<String, String> queryParameters = processQueryParameters(queryDataJson);
+    public Response postSearchJson(@FormDataParam("file") File file, @FormDataParam("search") String jsonSearchFilter) {
 
-        String finalJson = JsonFilter.queryJson(rawJson, queryParameters).toString();
+        // Write file to disk
+        CSVFileWriter writer = new CSVFileWriter();
+        String path = writer.write(file);
 
-        return Response.status(200).entity(finalJson).build();
+        // Verify that the file was written successfully
+        if (path != null) {
+            String finalJson = processCSVFilter(path, jsonSearchFilter).toString();
+
+            // Remove uploaded file when done
+            writer.delete(path);
+
+            return Response.status(200).entity(finalJson).build();
+        }
+
+        return Response.serverError().build();
     }
 
     /**
-     * Parses a given POST request body and returns the values as body parameters.
-     * @param body The body content received from a POST request.
-     * @return The processed
+     * Converts a CSV file at a given path to JSON and processes it using the search filter JSON object. The resulting
+     * filtered JSON is returned as a JSON array.
+     * @param path The path to the CSV file.
+     * @param jsonSearchFilter The JSON object containing column filters.
+     * @return The filtered JSON array of JSON objects.
      */
-    private Map<String, String> processPostBody(String body) {
-        Map<String, String> postParameters = new HashMap<>();
-        String[] splitBody = body.split("&");
-        for (int bodyIndex = 0; bodyIndex < splitBody.length; bodyIndex++) {
-            String fullParameter = splitBody[bodyIndex];
-            String[] splitParameter = fullParameter.split("=");
-            if (splitParameter.length == 2) {
-                String parameter = splitParameter[0];
-                String value = splitParameter[1];
-                postParameters.put(parameter, value);
-            }
-        }
-        return postParameters;
+    private JsonArray processCSVFilter(String path, String jsonSearchFilter) {
+        CodingCompCsvUtil parser = new CodingCompCsvUtil();
+        Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
+
+        // Retrieves the raw JSON text from the values map, expecting only 1 entry in the map
+        Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
+        String rawJson = entry.getValue();
+
+        // Retrieve search query parameters
+        Map<String, String> parameters = processJsonQueryParameters(jsonSearchFilter);
+        return JsonFilter.queryJson(rawJson, parameters);
     }
 
     /**
@@ -125,21 +148,23 @@ public class JSONQueryService {
      * @param json The string JSON object.
      * @return The map of query parameters.
      */
-    private Map<String, String> processQueryParameters(String json) {
+    private Map<String, String> processJsonQueryParameters(String json) {
         Map<String, String> queryParameters = new HashMap<>();
-        try {
-            JsonElement element = JsonParser.parseString(json);
-            if (element.isJsonObject()) {
-                JsonObject object = element.getAsJsonObject();
-                for (String column : object.keySet()) {
-                    String value = object.get(column).toString();
-                    queryParameters.put(column, value);
+        if (json != null) {
+            try {
+                JsonElement element = JsonParser.parseString(json);
+                if (element.isJsonObject()) {
+                    JsonObject object = element.getAsJsonObject();
+                    for (String column : object.keySet()) {
+                        String value = object.get(column).toString();
+                        queryParameters.put(column, value);
+                    }
                 }
+            } catch (JsonParseException exception) {
+                logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
+            } catch (Exception exception) {
+                logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
             }
-        } catch (JsonParseException exception) {
-            logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
-        } catch (Exception exception) {
-            logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
         }
         return queryParameters;
     }
