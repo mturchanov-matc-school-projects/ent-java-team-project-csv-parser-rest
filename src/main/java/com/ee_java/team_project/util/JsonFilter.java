@@ -93,14 +93,23 @@ public class JsonFilter {
         } else if (querySearch.matches("(^[0-9]+<$)")) {
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
             // Check if query value is greater than entered value
-        } else if (querySearch.matches("(^<[0-9]+$)|(^[0-9]+>$)")) {
+        } else if (querySearch.matches("(^<[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
             // Check if query value is greater than entered value
-        } else if (querySearch.matches("(^>=[0-9]+$)|(^[0-9]+<=$)")) {
+        } else if (querySearch.matches("(^[0-9]+>$)")) {
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
+            // Check if query value is greater than entered value
+        } else if (querySearch.matches("(^>=[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
             // Check if query value is less than actual value
-        } else if (querySearch.matches("(^<=[0-9]+$)|(^[0-9]+>=$)")) {
+        } else if (querySearch.matches("(^[0-9]+<=$)")) {
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
+            // Check if query value is less than actual value
+        } else if (querySearch.matches("(^<=[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
+            // Check if value exactly matches search query
+        } else if (querySearch.matches("(^[0-9]+>=$)")) {
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
             // Check if value exactly matches search query
         } else {
             matches = (querySearch.equals(actualValue));

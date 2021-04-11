@@ -96,6 +96,7 @@ public class JsonFilterTest {
                 "\"customerId\":207,\"closed\":\"true\",\"monthsOpen\":5}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", ">993");
+        parameters.put("claimId", "993<");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":994,\"customerId\":120,\"closed\":\"true\",\"monthsOpen" +
@@ -120,6 +121,7 @@ public class JsonFilterTest {
                 "\"monthsOpen\":10},{\"claimId\":10,\"customerId\":199,\"closed\":\"false\",\"monthsOpen\":1}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", "<10");
+        parameters.put("claimId", "10>");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":1,\"customerId\":140,\"closed\":\"false\",\"monthsOpen\":8},{" +
@@ -146,6 +148,7 @@ public class JsonFilterTest {
                 "\"monthsOpen\":5}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", ">=993");
+        parameters.put("claimId", "993<=");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":993,\"customerId\":127,\"closed\":\"true\",\"monthsOpen\":4},{" +
@@ -172,6 +175,7 @@ public class JsonFilterTest {
                 "\"monthsOpen\":10},{\"claimId\":10,\"customerId\":199,\"closed\":\"false\",\"monthsOpen\":1}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", "<=10");
+        parameters.put("claimId", "10>=");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":1,\"customerId\":140,\"closed\":\"false\",\"monthsOpen\":8},{" +
