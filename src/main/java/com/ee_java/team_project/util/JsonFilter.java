@@ -104,30 +104,37 @@ public class JsonFilter {
             operator = "!=";
             String queryValue = querySearch.replaceAll("!=", "");
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
+
         // Check if actual value contains any of the values from the entered query search (OR operator)
         } else if (querySearch.contains("|")) {
             String[] values = querySearch.split("\\|");
             matches = false;
+
             // Perform comparison for every entered value of or operator
             for (int index = 0; index < values.length; index++) {
                 String value = values[index].trim();
+
                 // Verify that value is not empty
                 if (!value.equals("")) {
                     matches = compareWithOperatorValue(value, actualValue, operator);
+
                     // Break out of loop when at least one expected value matches actual value
                     if (matches) {
                         break;
                     }
                 }
             }
+
         // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
         } else if (querySearch.matches("[><]=?[0-9]+")) {
             String queryValue = querySearch.replaceAll("[><]=?", "");
             operator = querySearch.replaceAll("[0-9]+", "");
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
+
         } else {
             matches = compareWithOperatorValue(actualValue, querySearch, operator);
         }
+
         return matches;
     }
 
