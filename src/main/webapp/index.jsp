@@ -31,6 +31,8 @@
                 <label for="pasteCSVInput">Paste Raw CSV</label>
             </div>
             <input type="submit" value="Upload" class="btn btn-primary">
+
+            <input type="hidden" id="fileNameInput" name="fileName" value="">
         </form>
 
         <c:choose>

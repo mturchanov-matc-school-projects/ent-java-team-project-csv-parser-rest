@@ -4,8 +4,10 @@
 const fileInputChanged = event => {
     let element = event.target;
     let label = document.querySelector("#fileInputLabel");
+    let fileNameInput = document.querySelector("#fileNameInput");
     let fileName = element.files[0].name;
     label.textContent = fileName;
+    fileNameInput.value = fileName;
 }
 
 /*
@@ -28,16 +30,19 @@ const updateCSVInputType = event => {
     let element = event.target;
     let csvFileInputGroup = document.querySelector("#csvFileInputGroup");
     let csvFileInput = document.querySelector("#fileInput");
+    let csvFileNameInput = document.querySelector("#fileNameInput");
     let rawCSVInputGroup = document.querySelector("#rawCSVInputGroup");
     let rawCSVInput = document.querySelector("#csvTextInput");
     if (element.checked) {
         csvFileInputGroup.hidden = true;
         csvFileInput.disabled = true;
+        csvFileNameInput.disabled = true;
         rawCSVInputGroup.hidden = false;
         rawCSVInput.disabled = false;
     } else {
         csvFileInputGroup.hidden = false;
         csvFileInput.disabled = false;
+        csvFileNameInput.disabled = false;
         rawCSVInputGroup.hidden = true;
         rawCSVInput.disabled = true;
     }
