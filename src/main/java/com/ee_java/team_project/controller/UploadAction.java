@@ -64,10 +64,10 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
         if (success) {
             url = "/endpoints.jsp";
             String fileName = request.getParameter("fileName");
+            feedback = "Successfully parsed CSV code.";
             if (fileName != null) {
                 feedback = "Successfully parsed " + fileName + " to JSON.";
             }
-            feedback = "Successfully parsed CSV code.";
         }
 
         request.setAttribute("feedback", feedback);
