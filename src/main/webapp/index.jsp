@@ -20,6 +20,14 @@
                 <label id="fileInputLabel" for="fileInput" class="custom-file-label">Choose file</label>
                 <input id="fileInput" type="file" name="file" class="custom-file-input" accept="text/csv" required>
             </div>
+            <div class="form-group">
+                <label for="csvTextInput"><span class="text-danger">*</span>Paste CSV Code Below</label>
+                <textarea name="csvText" id="csvTextInput" class="form-control"></textarea>
+            </div>
+            <div class="form-check pb-3">
+                <input type="checkbox" id="pasteCSVInput" class="form-check-input">
+                <label for="pasteCSVInput">Paste Raw CSV</label>
+            </div>
             <input type="submit" value="Upload" class="btn btn-primary">
         </form>
 
