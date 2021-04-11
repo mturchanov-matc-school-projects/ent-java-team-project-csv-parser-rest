@@ -139,13 +139,13 @@ public class CodingCompCsvUtil {
 		String filePathForCustomers = "/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/customers.csv";
 		String filePathForClaims = "/home/student/Desktop/java_ent_2021/2020-StateFarm-CodingCompetitionProblem/src/main/resources/DataFiles/claims.csv";
 
-		CodingCompCsvUtil csvUtil1 = new CodingCompCsvUtil();
+		//CodingCompCsvUtil csvUtil1 = new CodingCompCsvUtil();
 		//String customersResult = csvUtil.readCsvFileFileWithoutPojo(filePathForCustomers);
 		//String agentsResult = csvUtil.readCsvFileFileWithoutPojo(filePathForAgents);
-		Map<List<String>, String> claimsResult = csvUtil.readCsvFileFileWithoutPojo(filePathForClaims);
-		for (Map.Entry<List<String>, String> entry : claimsResult.entrySet()) {
-			System.out.printf("keys: %s%nparsed json: %s%n", entry.getKey(), entry.getValue());
-		}
+		//Map<List<String>, String> claimsResult = csvUtil.readCsvFileFileWithoutPojo(filePathForClaims);
+		//for (Map.Entry<List<String>, String> entry : claimsResult.entrySet()) {
+		//	System.out.printf("keys: %s%nparsed json: %s%n", entry.getKey(), entry.getValue());
+		//}
 		//System.out.println(customersResult);
 	}
 }
