@@ -1,5 +1,8 @@
 package com.ee_java.team_project.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 import java.util.*;
 
@@ -7,7 +10,7 @@ import java.util.*;
  * This interface contains a default method that can be used anywhere a Properties
  * object is needed to be loaded.
  * @author Eric Knapp
- *
+ * @author pjcraig
  */
 public interface PropertiesLoader {
 
@@ -19,13 +22,15 @@ public interface PropertiesLoader {
      * the file path was not found.
      */
     default Properties loadProperties(String propertiesFilePath){
+        Logger logger = LogManager.getLogger();
+
         Properties properties = new Properties();
         try {
             properties.load(this.getClass().getResourceAsStream(propertiesFilePath));
         } catch (IOException ioException) {
-            ioException.printStackTrace();
+            logger.error("IO exception occurred while loading properties file!", ioException);
         } catch (Exception exception) {
-            exception.printStackTrace();
+            logger.error("Unknown exception occurred while loading properties file!", exception);
         }
         return properties;
     }
