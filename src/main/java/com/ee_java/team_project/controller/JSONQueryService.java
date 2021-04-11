@@ -1,14 +1,24 @@
 package com.ee_java.team_project.controller;
 
+import com.ee_java.team_project.csv_parser.CodingCompCsvUtil;
+import com.ee_java.team_project.util.CSVFileWriter;
 import com.ee_java.team_project.util.JsonFilter;
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
+import javax.print.attribute.standard.Media;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +78,7 @@ public class JSONQueryService {
      */
     @POST
     @Path("/count")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
     public Response postCountJson(String body) {
         Map<String, String> bodyParameters = processPostBody(body);
@@ -88,16 +99,32 @@ public class JSONQueryService {
      */
     @POST
     @Path("/search")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response postSearchJson(String body) {
-        Map<String, String> bodyParameters = processPostBody(body);
-        String rawJson = bodyParameters.get("csv");
-        String queryDataJson = bodyParameters.get("search");
-        Map<String, String> queryParameters = processQueryParameters(queryDataJson);
+    public Response postSearchJson(@FormDataParam("file") String file, @FormDataParam("file") FormDataContentDisposition fileMetaData, @FormDataParam("search") String search) {
 
-        String finalJson = JsonFilter.queryJson(rawJson, queryParameters).toString();
+        // Write file to disk
+        CSVFileWriter writer = new CSVFileWriter();
+        String path = writer.write(new ByteArrayInputStream(file.getBytes()));
 
-        return Response.status(200).entity(finalJson).build();
+        // Verify that the file was written successfully
+        if (path != null) {
+            CodingCompCsvUtil parser = new CodingCompCsvUtil();
+            Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
+
+            // Retrieves the raw JSON text from the values map, expecting only 1 entry in the map
+            Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
+            String rawJson = entry.getValue();
+
+            // Retrieve search query parameters
+            Map<String, String> parameters = processQueryParameters(search);
+
+            String finalJson = JsonFilter.queryJson(rawJson, parameters).toString();
+
+            return Response.status(200).entity(finalJson).build();
+        }
+
+        return Response.serverError().build();
     }
 
     /**
@@ -127,19 +154,21 @@ public class JSONQueryService {
      */
     private Map<String, String> processQueryParameters(String json) {
         Map<String, String> queryParameters = new HashMap<>();
-        try {
-            JsonElement element = JsonParser.parseString(json);
-            if (element.isJsonObject()) {
-                JsonObject object = element.getAsJsonObject();
-                for (String column : object.keySet()) {
-                    String value = object.get(column).toString();
-                    queryParameters.put(column, value);
+        if (json != null) {
+            try {
+                JsonElement element = JsonParser.parseString(json);
+                if (element.isJsonObject()) {
+                    JsonObject object = element.getAsJsonObject();
+                    for (String column : object.keySet()) {
+                        String value = object.get(column).toString();
+                        queryParameters.put(column, value);
+                    }
                 }
+            } catch (JsonParseException exception) {
+                logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
+            } catch (Exception exception) {
+                logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
             }
-        } catch (JsonParseException exception) {
-            logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
-        } catch (Exception exception) {
-            logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
         }
         return queryParameters;
     }
