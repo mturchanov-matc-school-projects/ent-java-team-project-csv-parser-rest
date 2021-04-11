@@ -99,9 +99,15 @@ public class JsonFilter {
         boolean matches;
         String queryValue = querySearch.replaceAll("(^<=?|>=?)|(<=?|>=?$)", "");
         String operator = querySearch.replaceAll("[0-9]+", "");
-        // Check if actual value contains any of the values from the entered query search
-        if (querySearch.contains("|")) {
-            operator = "|";
+
+        // Check if entered value is not equal to actual value
+        if (querySearch.contains("!=")) {
+            operator = "!=";
+            queryValue = querySearch.replaceAll("!=", "");
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
+        // Check if actual value contains any of the values from the entered query search (OR operator)
+        } else if (querySearch.contains("|")) {
+            operator = "=";
             String[] values = querySearch.split("\\|");
             matches = false;
             // Perform comparison for every entered value of or operator
@@ -147,9 +153,9 @@ public class JsonFilter {
     }
 
     /**
-     * Compares two values against each other using a provided comparison operator. Valid operators are <, <=, >, >=,
-     * and |. Numeric comparison operators to integers in the process of comparing and will return false
-     * if they cannot be converted.
+     * Compares two values against each other using a provided comparison operator. Valid operators are <, <=, >, >=, =,
+     * and !=. Numeric comparison operators convert String values to integers and will return false if they cannot be
+     * converted.
      * @param value1 The first value to compare.
      * @param value2 The second value to compare.
      * @param operator The operator to compare with (<, <=, >, >=).
@@ -157,21 +163,25 @@ public class JsonFilter {
      */
     private static boolean compareWithOperatorValue(String value1, String value2, String operator) {
         boolean result = false;
-        //if OR operator then check if contains and out
-        if (operator.equals("|")) {
-            result = value1.contains(value2);
+        // If NOT EQUAL operator then
+        if (operator.equals("!=")) {
+            result = !value1.equals(value2);
+        // If equals operator then check if contains value
+        } else if (operator.equals("=")) {
+            result = value1.equals(value2);
         } else {
+            // Compare using numeric operators
             try {
                 int number1 = Integer.parseInt(value1);
                 int number2 = Integer.parseInt(value2);
                 if (operator.equals(">")) {
-                    result = (number1 > number2);
+                    result = number1 > number2;
                 } else if (operator.equals("<")) {
-                    result = (number1 < number2);
+                    result = number1 < number2;
                 } else if (operator.equals(">=")) {
-                    result = (number1 >= number2);
+                    result = number1 >= number2;
                 } else if (operator.equals("<=")) {
-                    result = (number1 <= number2);
+                    result = number1 <= number2;
                 }
             } catch (NumberFormatException exception) {
                 logger.error("Invalid value provided while converting to integer!", exception);
