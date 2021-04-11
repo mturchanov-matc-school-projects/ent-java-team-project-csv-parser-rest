@@ -11,14 +11,35 @@ const fileInputChanged = event => {
 /*
 * Changes JSON query form action to count if the count checkbox has been checked
 */
-const countResultsChanged = event => {
+const updateFormEndpoint = event => {
     let element = event.target;
-
     let queryForm = document.querySelector("#queryForm");
     if (element.checked) {
         queryForm.setAttribute("action", "rest/jsonqueryservice/count");
     } else {
         queryForm.setAttribute("action", "rest/jsonqueryservice/search");
+    }
+}
+
+/*
+* Changes JSON query form action to count if the count checkbox has been checked
+*/
+const updateCSVInputType = event => {
+    let element = event.target;
+    let csvFileInputGroup = document.querySelector("#csvFileInputGroup");
+    let csvFileInput = document.querySelector("#fileInput");
+    let rawCSVInputGroup = document.querySelector("#rawCSVInputGroup");
+    let rawCSVInput = document.querySelector("#csvTextInput");
+    if (element.checked) {
+        csvFileInputGroup.hidden = true;
+        csvFileInput.disabled = true;
+        rawCSVInputGroup.hidden = false;
+        rawCSVInput.disabled = false;
+    } else {
+        csvFileInputGroup.hidden = false;
+        csvFileInput.disabled = false;
+        rawCSVInputGroup.hidden = true;
+        rawCSVInput.disabled = true;
     }
 }
 
@@ -31,7 +52,12 @@ const formStyleInit = () => {
 
     let countResultsInput = document.querySelector("#countResults");
     if (countResultsInput) {
-        countResultsInput.addEventListener("change", countResultsChanged);
+        countResultsInput.addEventListener("change", updateFormEndpoint);
+    }
+
+    let pasteCSVInput = document.querySelector("#pasteCSVInput");
+    if (pasteCSVInput) {
+        pasteCSVInput.addEventListener("change", updateCSVInputType);
     }
 }
 
