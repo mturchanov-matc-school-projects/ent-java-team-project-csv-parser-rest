@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -94,18 +95,18 @@ public class JSONQueryService {
 
     /**
      * Returns JSON elements based on the JSON to filter and a list of columns and values to compare.
-     * @param body The body content of the POST request.
+     * @param file The file path to the.
      * @return The response containing the queried JSON element.
      */
     @POST
     @Path("/search")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response postSearchJson(@FormDataParam("file") String file, @FormDataParam("file") FormDataContentDisposition fileMetaData, @FormDataParam("search") String search) {
+    public Response postSearchJson(@FormDataParam("file") File file, @FormDataParam("search") String search) {
 
         // Write file to disk
         CSVFileWriter writer = new CSVFileWriter();
-        String path = writer.write(new ByteArrayInputStream(file.getBytes()));
+        String path = writer.write(file);
 
         // Verify that the file was written successfully
         if (path != null) {
