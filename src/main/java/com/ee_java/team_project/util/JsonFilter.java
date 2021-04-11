@@ -54,33 +54,11 @@ public class JsonFilter {
                                 String column = entry.getKey();
                                 String value = entry.getValue();
 
-                                //logger.debug("Querying for column {} in {}", column, currentObject);
                                 // Verify that the given column exists on the object as a property
                                 if (currentObject.has(column)) {
                                     String foundValue = currentObject.get(column).toString().replaceAll("^\"|\"$", "");
-                                    //logger.debug("Comparing value {} to expected value {}", foundValue, value);
                                     // Break out of loop if a single value does not match
-                                    if (value.matches("(^>[0-9]+$)|(^[0-9]+<$)")) {
-                                        // Greater than search initiated
-                                        value = value.replaceAll("^>|<$", "");
-                                        int foundValueInt = Integer.parseInt(foundValue);
-                                        int valueInt = Integer.parseInt(value);
-                                        if (foundValueInt <= valueInt) {
-                                            logger.debug("if found value is greater than valueInt + valueInt {} {}", foundValueInt, valueInt);
-                                            allMatches = false;
-                                            break;
-                                        }
-                                    } else if (value.matches("(^<[0-9]+$)|(^[0-9]+>$)")) {
-                                        value = value.replaceAll("^<|>$", "");
-                                        int foundValueInt = Integer.parseInt(foundValue);
-                                        int valueInt = Integer.parseInt(value);
-                                        // Less than search initiated
-                                        if (foundValueInt >= valueInt) {
-                                            logger.debug("if found value is less than valueInt + valueInt {} {}", foundValueInt, valueInt);
-                                            allMatches = false;
-                                            break;
-                                        }
-                                    } else if (!foundValue.equals(value)) {
+                                    if (!compareValue(value, foundValue)) {
                                         allMatches = false;
                                         break;
                                     }
@@ -100,5 +78,55 @@ public class JsonFilter {
         }
 
         return results;
+    }
+
+    private static boolean compareValue(String querySearch, String actualValue) {
+        boolean matches;
+        String queryValue = querySearch.replaceAll("(^<=?|>=?)|(<=?|>=?$)", "");
+        String operator = querySearch.replaceAll("[0-9]+", "");
+        logger.debug("Query value: {}", queryValue);
+        logger.debug("Operator: {}", operator);
+        // Check if query value is greater than entered value
+        if (querySearch.matches("(^>[0-9]+$)")) {
+            matches = compareWithOperatorValue(actualValue, queryValue, operator);
+            // Check if query value value is less than actual value
+        } else if (querySearch.matches("(^[0-9]+<$)")) {
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
+            // Check if query value is greater than entered value
+        } else if (querySearch.matches("(^<[0-9]+$)|(^[0-9]+>$)")) {
+            matches = compareWithOperatorValue(actualValue, queryValue, operator);
+            // Check if query value is greater than entered value
+        } else if (querySearch.matches("(^>=[0-9]+$)|(^[0-9]+<=$)")) {
+            matches = compareWithOperatorValue(actualValue, queryValue, operator);
+            // Check if query value is less than actual value
+        } else if (querySearch.matches("(^<=[0-9]+$)|(^[0-9]+>=$)")) {
+            matches = compareWithOperatorValue(actualValue, queryValue, operator);
+            // Check if value exactly matches search query
+        } else {
+            matches = (querySearch.equals(actualValue));
+        }
+        return matches;
+    }
+
+    private static boolean compareWithOperatorValue(String value1, String value2, String operator) {
+        boolean result = false;
+        try {
+            int number1 = Integer.parseInt(value1);
+            int number2 = Integer.parseInt(value2);
+            if (operator.equals(">")) {
+                result = (number1 > number2);
+            } else if (operator.equals("<")) {
+                result = (number1 < number2);
+            } else if (operator.equals(">=")) {
+                result = (number1 >= number2);
+            } else if (operator.equals("<=")) {
+                result = (number1 <= number2);
+            }
+        } catch (NumberFormatException exception) {
+            logger.error("Invalid value provided while converting to integer!", exception);
+        } catch (Exception exception) {
+            logger.error("Unknown exception occurred while parsing values to integer!", exception);
+        }
+        return result;
     }
 }
