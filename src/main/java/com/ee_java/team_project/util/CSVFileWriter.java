@@ -54,6 +54,26 @@ public class CSVFileWriter implements PropertiesLoader {
     }
 
     /**
+     * Attempts to write a CSV file using the provided file to disk. The
+     * file path is returned if the file was written successfully or null if not.
+     * @param file The file write on disk.
+     * @return The path to the file or null.
+     */
+    public String write(File file) {
+        String filePath = null;
+        try (FileInputStream stream = new FileInputStream(file)) {
+             filePath = write(stream);
+        } catch (FileNotFoundException exception) {
+            logger.error("File not found exception occurred while writing uploaded file '{}'!", file, exception);
+        } catch (IOException exception) {
+            logger.error("IO Exception occurred while writing uploaded file '{}'!", file, exception);
+        } catch (Exception exception) {
+            logger.error("Unknown exception occurred while writing uploaded file '{}'!", file, exception);
+        }
+        return filePath;
+    }
+
+    /**
      * Deletes the CSV file at a given path if it exists.
      * @param path The String path of the directory to create.
      * @return Whether or not the file was able to be deleted.
