@@ -54,26 +54,6 @@ public class CSVFileWriter implements PropertiesLoader {
     }
 
     /**
-     * Attempts to write a CSV file using the provided file to disk. The
-     * file path is returned if the file was written successfully or null if not.
-     * @param file The file to write to disk.
-     * @return The path to the file or null.
-     */
-    public String write(File file) {
-        String path = null;
-        if (file != null) {
-            try (FileInputStream stream = new FileInputStream(file)) {
-                path = write(stream);
-            } catch (IOException exception) {
-                logger.error("Unable to convert file to file input stream.", exception);
-            } catch (Exception exception) {
-                logger.error("Unknown exception occurred while converting file to file input stream.", exception);
-            }
-        }
-        return path;
-    }
-
-    /**
      * Deletes the CSV file at a given path if it exists.
      * @param path The String path of the directory to create.
      * @return Whether or not the file was able to be deleted.
