@@ -97,17 +97,15 @@ public class JsonFilter {
      */
     private static boolean compareValue(String querySearch, String actualValue) {
         boolean matches;
-        String queryValue = querySearch.replaceAll("(^<=?|>=?)|(<=?|>=?$)", "");
-        String operator = querySearch.replaceAll("[0-9]+", "");
+        String operator = "=";
 
         // Check if entered value is not equal to actual value
         if (querySearch.contains("!=")) {
             operator = "!=";
-            queryValue = querySearch.replaceAll("!=", "");
+            String queryValue = querySearch.replaceAll("!=", "");
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
         // Check if actual value contains any of the values from the entered query search (OR operator)
         } else if (querySearch.contains("|")) {
-            operator = "=";
             String[] values = querySearch.split("\\|");
             matches = false;
             // Perform comparison for every entered value of or operator
@@ -122,32 +120,13 @@ public class JsonFilter {
                     }
                 }
             }
-        // Check if actual value is greater than entered value
-        } else if (querySearch.matches("(^>[0-9]+$)")) {
+        // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
+        } else if (querySearch.matches("[><]=?[0-9]+")) {
+            String queryValue = querySearch.replaceAll("[><]=?", "");
+            operator = querySearch.replaceAll("[0-9]+", "");
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
-        // Check if entered value is less than actual value
-        } else if (querySearch.matches("(^[0-9]+<$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-        // Check if actual value is less than entered value
-        } else if (querySearch.matches("(^<[0-9]+$)")) {
-            matches = compareWithOperatorValue(actualValue, queryValue, operator);
-        // Check if entered value is greater than actual value
-        } else if (querySearch.matches("(^[0-9]+>$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-        // Check if actual value is greater than or equal to entered value
-        } else if (querySearch.matches("(^>=[0-9]+$)")) {
-            matches = compareWithOperatorValue(actualValue, queryValue, operator);
-        // Check if entered value is less than or equal to actual value
-        } else if (querySearch.matches("(^[0-9]+<=$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
-        // Check if actual value is less than or equal to entered value
-        } else if (querySearch.matches("(^<=[0-9]+$)")) {
-            matches = compareWithOperatorValue(actualValue, queryValue, operator);
-        // Check if entered value is greater than or equal to actual value
-        } else if (querySearch.matches("(^[0-9]+>=$)")) {
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
         } else {
-            matches = (querySearch.equals(actualValue));
+            matches = compareWithOperatorValue(actualValue, querySearch, operator);
         }
         return matches;
     }
