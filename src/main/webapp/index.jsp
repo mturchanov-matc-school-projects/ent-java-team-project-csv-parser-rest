@@ -15,14 +15,16 @@
         <p><span class="text-danger">*</span> - Required field</p>
 
         <form action="upload" method="post" enctype="multipart/form-data">
-            <p><span class="text-danger">*</span>Upload a Comma-Separated Value (.csv) file</p>
-            <div class="custom-file mb-3">
-                <label id="fileInputLabel" for="fileInput" class="custom-file-label">Choose file</label>
-                <input id="fileInput" type="file" name="file" class="custom-file-input" accept="text/csv" required>
+            <div id="csvFileInputGroup">
+                <p><span class="text-danger">*</span>Upload a Comma-Separated Value (.csv) file</p>
+                <div class="custom-file mb-3">
+                    <label id="fileInputLabel" for="fileInput" class="custom-file-label">Choose file</label>
+                    <input id="fileInput" type="file" name="file" class="custom-file-input" accept="text/csv" required>
+                </div>
             </div>
-            <div class="form-group">
+            <div id="rawCSVInputGroup" class="form-group" hidden>
                 <label for="csvTextInput"><span class="text-danger">*</span>Paste CSV Code Below</label>
-                <textarea name="csvText" id="csvTextInput" class="form-control"></textarea>
+                <textarea name="csvText" id="csvTextInput" class="form-control" required disabled></textarea>
             </div>
             <div class="form-check pb-3">
                 <input type="checkbox" id="pasteCSVInput" class="form-check-input">
