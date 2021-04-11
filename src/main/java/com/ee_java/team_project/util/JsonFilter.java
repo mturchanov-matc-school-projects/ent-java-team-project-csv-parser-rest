@@ -4,7 +4,9 @@ import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,7 +36,7 @@ public class JsonFilter {
                 }
             }
 
-            logger.debug("Searching JSON with parameters {}", parametersCopy);
+            //logger.debug("Searching JSON with parameters {}", parametersCopy);
 
             // Attempt to parse provided JSON element as JSON
             try {
@@ -84,8 +86,13 @@ public class JsonFilter {
         boolean matches;
         String queryValue = querySearch.replaceAll("(^<=?|>=?)|(<=?|>=?$)", "");
         String operator = querySearch.replaceAll("[0-9]+", "");
-        logger.debug("Query value: {}", queryValue);
-        logger.debug("Operator: {}", operator);
+        if (querySearch.contains("|")) {
+            operator = "|";
+        }
+
+
+        //logger.debug("Query value: {}", queryValue);
+        //logger.debug("Operator: {}", operator);
         // Check if query value is greater than entered value
         if (querySearch.matches("(^>[0-9]+$)")) {
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
@@ -110,6 +117,9 @@ public class JsonFilter {
             // Check if value exactly matches search query
         } else if (querySearch.matches("(^[0-9]+>=$)")) {
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
+            // Check if value contains in entered input
+        } else if (querySearch.contains("|")) {
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
             // Check if value exactly matches search query
         } else {
             matches = (querySearch.equals(actualValue));
@@ -119,6 +129,11 @@ public class JsonFilter {
 
     private static boolean compareWithOperatorValue(String value1, String value2, String operator) {
         boolean result = false;
+        //if OR operator then check if contains and out
+        if (operator.equals("|")) {
+            return value1.contains(value2);
+        }
+
         try {
             int number1 = Integer.parseInt(value1);
             int number2 = Integer.parseInt(value2);
@@ -138,4 +153,6 @@ public class JsonFilter {
         }
         return result;
     }
+
+
 }
