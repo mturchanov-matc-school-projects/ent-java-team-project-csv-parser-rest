@@ -19,6 +19,8 @@ public class CodingCompCsvUtil {
 
 	/**
 	 * Read csv file with pojo.
+	 * It was written before requirement of RESTful service.
+	 * Is not used in the current version
 	 *
 	 * @param <T>       the type parameter
 	 * @param filePath  the file path
@@ -58,6 +60,8 @@ public class CodingCompCsvUtil {
 	 *
 	 * @param filePath the file path
 	 * @return the map
+	 *
+	 * @author mturchanov
 	 */
 	public Map<List<String>, String> readCsvFileFileWithoutPojo(String filePath) {
 		List<String> lblList = null;
@@ -115,8 +119,6 @@ public class CodingCompCsvUtil {
 		return result;
 	}
 
-
-
 	private boolean isNumeric(String s) {
 		return s != null && s.matches("[-+]?\\d*\\.?\\d+");
 	}
@@ -140,7 +142,10 @@ public class CodingCompCsvUtil {
 		CodingCompCsvUtil csvUtil1 = new CodingCompCsvUtil();
 		//String customersResult = csvUtil.readCsvFileFileWithoutPojo(filePathForCustomers);
 		//String agentsResult = csvUtil.readCsvFileFileWithoutPojo(filePathForAgents);
-		//String claimsResult = csvUtil.readCsvFileFileWithoutPojo(filePathForClaims);
+		Map<List<String>, String> claimsResult = csvUtil.readCsvFileFileWithoutPojo(filePathForClaims);
+		for (Map.Entry<List<String>, String> entry : claimsResult.entrySet()) {
+			System.out.printf("keys: %s%nparsed json: %s%n", entry.getKey(), entry.getValue());
+		}
 		//System.out.println(customersResult);
 	}
 }
