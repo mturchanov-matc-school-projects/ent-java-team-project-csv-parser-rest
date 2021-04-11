@@ -96,7 +96,6 @@ public class JsonFilterTest {
                 "\"customerId\":207,\"closed\":\"true\",\"monthsOpen\":5}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", ">993");
-        parameters.put("claimId", "993<");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":994,\"customerId\":120,\"closed\":\"true\",\"monthsOpen" +
@@ -121,7 +120,6 @@ public class JsonFilterTest {
                 "\"monthsOpen\":10},{\"claimId\":10,\"customerId\":199,\"closed\":\"false\",\"monthsOpen\":1}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", "<10");
-        parameters.put("claimId", "10>");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":1,\"customerId\":140,\"closed\":\"false\",\"monthsOpen\":8},{" +
@@ -148,7 +146,6 @@ public class JsonFilterTest {
                 "\"monthsOpen\":5}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", ">=993");
-        parameters.put("claimId", "993<=");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":993,\"customerId\":127,\"closed\":\"true\",\"monthsOpen\":4},{" +
@@ -175,7 +172,6 @@ public class JsonFilterTest {
                 "\"monthsOpen\":10},{\"claimId\":10,\"customerId\":199,\"closed\":\"false\",\"monthsOpen\":1}]";
         Map<String, String> parameters = new HashMap<>();
         parameters.put("claimId", "<=10");
-        parameters.put("claimId", "10>=");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
         String expectedResults = "[{\"claimId\":1,\"customerId\":140,\"closed\":\"false\",\"monthsOpen\":8},{" +
@@ -188,7 +184,6 @@ public class JsonFilterTest {
                 "\",\"monthsOpen\":10},{\"claimId\":10,\"customerId\":199,\"closed\":\"false\",\"monthsOpen\":1}]";
         assertEquals(expectedResults, stringResults);
     }
-
 
     //PASSING
     @Test
@@ -203,11 +198,32 @@ public class JsonFilterTest {
         parameters.put("monthsOpen", "7|5");
         JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
         String stringResults = actualResults.toString();
-        System.out.println(stringResults);
         String expectedResults = "[{\"claimId\":994,\"customerId\":120,\"closed\":\"true\",\"monthsOpen\":7}," +
                 "{\"claimId\":996,\"customerId\":370,\"closed\":\"true\",\"monthsOpen\":5},{\"claimId\":999," +
                 "\"customerId\":258,\"closed\":\"false\",\"monthsOpen\":7},{\"claimId\":1000,\"customerId\":207," +
                 "\"closed\":\"true\",\"monthsOpen\":5}]";
+        assertEquals(expectedResults, stringResults);
+    }
+
+    /**
+     * Tests filtering JSON data using the NOT EQUAL operator.
+     */
+    @Test
+    void filterWithNotEquals() {
+        testData = "[{\"claimId\":994,\"customerId\":120,\"closed\":\"true\",\"monthsOpen\":7},{\"claimId\":995," +
+                "\"customerId\":351,\"closed\":\"true\",\"monthsOpen\":2},{\"claimId\":996,\"customerId\":370," +
+                "\"closed\":\"true\",\"monthsOpen\":5},{\"claimId\":997,\"customerId\":377,\"closed\":\"true\"," +
+                "\"monthsOpen\":1},{\"claimId\":998,\"customerId\":377,\"closed\":\"false\",\"monthsOpen\":10},{" +
+                "\"claimId\":999,\"customerId\":258,\"closed\":\"false\",\"monthsOpen\":7},{\"claimId\":1000," +
+                "\"customerId\":207,\"closed\":\"true\",\"monthsOpen\":5}]";
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("closed", "!=false");
+        JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
+        String stringResults = actualResults.toString();
+        String expectedResults = "[{\"claimId\":994,\"customerId\":120,\"closed\":\"true\",\"monthsOpen\":7},{\"claimId\":995," +
+                "\"customerId\":351,\"closed\":\"true\",\"monthsOpen\":2},{\"claimId\":996,\"customerId\":370," +
+                "\"closed\":\"true\",\"monthsOpen\":5},{\"claimId\":997,\"customerId\":377,\"closed\":\"true\"," +
+                "\"monthsOpen\":1},{\"claimId\":1000,\"customerId\":207,\"closed\":\"true\",\"monthsOpen\":5}]";
         assertEquals(expectedResults, stringResults);
     }
 
