@@ -1,28 +1,31 @@
-# Movies aggregator
+# RESTful CSV Parser API
 ### Presentation Description/Overview
 #### Description
-The app is a rest csv parser to JSON format. 
-In addition, the application provides the basic filtering of JSON based on user's input  
+The app is a rest CSV parser to JSON format. 
+In addition, the application provides basic filtering of JSON based on user's input
 
 
 #### Pages and functionality:
-###### Index
-* upload csv page  
-* documentation page with endpoints  
-    * (maybe) dynamically creating an endpoint based on user input's   
-* bunch of rest endpoints  
+###### Index Page
+* Upload csv page
+
+###### Documentation Page
+* Documentation page with endpoints
+
+###### Endpoints
+* GET and POST at .../rest/jsonqueryservice/search
+* GET and POST at .../rest/jsonqueryservice/count
 
 
 ###### Logic on rest
-After parsing csv application generates JSON with all items.   
+Upload CSV file for parsing application to generate JSON containing all CSV data.   
 Endpoints will check query parameters to filter JSON with all items.
 
-Then based on this JSON several endpoints are generated:  
-* getAll?param=val&...  
-* getById  
-* getCount?param=val&...  
+These steps can be done in one single step if CSV data is POSTed to either of the endpoints with a search query.
 
+### Project Design Documents
 
-### Journal
-
+[//]: # (TODO: Complete missing team project documents)
+[Link to the problem statement (might be in readme instead?)]()
+[Link to the project plan]()
 [Link to the journal](Journal.md)
