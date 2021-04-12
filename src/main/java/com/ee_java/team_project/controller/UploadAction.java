@@ -5,14 +5,12 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.security.Security;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import com.ee_java.team_project.csv_parser.CodingCompCsvUtil;
 import com.ee_java.team_project.util.CSVFileWriter;
@@ -57,16 +55,25 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String url = "/index.jsp";
-        String feedback = "Failed to upload the file. Please try again later.";
+        String feedback = "Successfully parsed CSV code.";
+
+        // Retrieve uploaded file name
+        String fileName = request.getParameter("fileName");
+
+        // Generate success message including file name
+        if (fileName != null) {
+            feedback = "Successfully parsed " + fileName + " to JSON.";
+        }
+
         boolean success = processCSVFile(request);
 
         // Verify that CSV file was processed successfully
         if (success) {
             url = "/endpoints.jsp";
-            String fileName = request.getParameter("fileName");
-            feedback = "Successfully parsed CSV code.";
-            if (fileName != null) {
-                feedback = "Successfully parsed " + fileName + " to JSON.";
+        } else {
+            feedback = "Failed to upload the file. Please try again later.";
+            if (fileName != null && !fileName.toLowerCase().endsWith(".csv")) {
+                feedback = "You must upload a valid CSV file.";
             }
         }
 
@@ -82,40 +89,49 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      * @return Whether or not the processing succeeded without error.
      */
     public boolean processCSVFile(HttpServletRequest request) {
-        try {
-            Collection<Part> parts = request.getParts();
-            CSVFileWriter writer = new CSVFileWriter();
-            for (Part part : parts) {
-                String path = writer.write(part.getInputStream());
-
-                // Verify that files were successfully written to disk
-                if (path != null) {
-
-                    // Parse CSV to JSON
-                    CodingCompCsvUtil parser = new CodingCompCsvUtil();
-                    Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
-
-                    // Retrieve columns list and parsed JSON, expecting only 1 entry in the map
-                    Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
-                    List<String> columns = entry.getKey();
-                    String rawJson = entry.getValue();
-
-                    // Store column and JSON data
-                    HttpSession session = request.getSession();
-                    session.setAttribute("columns", columns);
-                    session.setAttribute("json", rawJson);
-
-                    // Escape loop since only 1 CSV file is allowed at a time
-                    return true;
-                } else {
-                    logger.error("Failed to write uploaded files to disk!");
+        CSVFileWriter writer = new CSVFileWriter();
+        String csvText = (String) request.getAttribute("csvText");
+        String path = null;
+        // Verify CSV text input exists before checking uploaded file
+        if (csvText != null) {
+            path = writer.write(new ByteArrayInputStream(csvText.getBytes()));
+        } else {
+            String fileName = request.getParameter("fileName");
+            if (fileName != null && fileName.toLowerCase().endsWith(".csv")) {
+                try {
+                    Collection<Part> parts = request.getParts();
+                    Part part = parts.iterator().next();
+                    path = writer.write(part.getInputStream());
+                } catch (IOException exception) {
+                    logger.error("IO exception occurred while processing uploaded file parts.", exception);
+                } catch (Exception exception) {
+                    logger.error("Unknown exception occurred while processing uploaded file parts.", exception);
                 }
             }
-        } catch (IOException exception) {
-            logger.error("IO exception occurred while processing uploaded file parts.", exception);
-        } catch (Exception exception) {
-            logger.error("Unknown exception occurred while processing uploaded file parts.", exception);
         }
+
+        // Verify that files were successfully written to disk
+        if (path != null) {
+            // Parse CSV to JSON
+            CodingCompCsvUtil parser = new CodingCompCsvUtil();
+            Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
+
+            // Retrieve columns list and parsed JSON, expecting only 1 entry in the map
+            Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
+            List<String> columns = entry.getKey();
+            String rawJson = entry.getValue();
+
+            // Store column and JSON data
+            HttpSession session = request.getSession();
+            session.setAttribute("columns", columns);
+            session.setAttribute("json", rawJson);
+
+            // Escape loop since only 1 CSV file is allowed at a time
+            return true;
+        } else {
+            logger.error("Failed to write uploaded files to disk!");
+        }
+
         return false;
     }
 
