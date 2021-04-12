@@ -241,4 +241,19 @@ public class JsonFilterTest {
         assertEquals(expectedResults, stringResults);
     }
 
+
+    /**
+     * Verifies filtering JSON data using the NOT EQUAL operator (!=) functions as expected.
+     */
+    @Test
+    void filterWithJsonPath() {
+        testData = "[ { \"name\": \"apple\", \"number\": 6, \"city\": \"Madison\" }, { \"name\": \"pineapple\", \"number\": 10, \"city\": \"Washington\" }, { \"name\": \"strawberry\", \"number\": 10, \"city\": \"Madison\" } ]";
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("orders", "$..[?(@.city== 'Madison')]"); //look for only objects that are in Madison
+        JsonArray actualResults = JsonFilter.queryJson(testData, parameters);
+        String stringResults = actualResults.toString();
+        String expectedResults = "[{\"name\":\"apple\",\"number\":6,\"city\":\"Madison\"},{\"name\":\"pineapple\",\"number\":10,\"city\":\"Washington\"},{\"name\":\"strawberry\",\"number\":10,\"city\":\"Madison\"}]";
+        assertEquals(expectedResults, stringResults);
+    }
+
 }
