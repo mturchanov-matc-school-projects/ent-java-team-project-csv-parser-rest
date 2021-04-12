@@ -26,6 +26,6 @@ These steps can be done in one single step if CSV data is POSTed to either of th
 ### Project Design Documents
 
 [//]: # (TODO: Complete missing team project documents)
-[Link to the problem statement (might be in readme instead?)]()
-[Link to the project plan]()
-[Link to the journal](Journal.md)
+* [Link to the problem statement (might be in readme instead?)]()
+* [Link to the project plan]()
+* [Link to the journal](Journal.md)
