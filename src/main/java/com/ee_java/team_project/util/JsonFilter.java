@@ -90,7 +90,8 @@ public class JsonFilter {
 
     /**
      * Compares the user-entered query to the actual value. The query search can contain numerical comparison operators
-     * such as >, >=, <, and <=. If no operator is specified, the values are compared exactly.
+     * such as >, >=, <, and <=. If no operator is specified, the values are compared exactly. Regex can also be entered
+     * by putting Java-compatible regex inside forward slashes (/).
      * @param querySearch The user-entered query to search with.
      * @param actualValue The actual value to compare against.
      * @return Whether or not the query search compares to the actual value.
@@ -99,31 +100,22 @@ public class JsonFilter {
         boolean matches;
         String operator = "=";
 
+        // Check if entered value contains regex and process actual value using it
+        if (querySearch.matches("^\\/.+\\/$")) {
+            String regex = querySearch.replaceAll("^\\/|\\/$", "");
+            matches = actualValue.matches(regex);
         // Check if entered value is not equal to actual value
-        if (querySearch.contains("!=")) {
+        } else if (querySearch.contains("!=")) {
             operator = "!=";
             String queryValue = querySearch.replaceAll("!=", "");
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
 
             // Check if actual value contains any of the values from the entered query search (OR operator)
         } else if (querySearch.contains("|")) {
-            String[] values = querySearch.split("\\|");
-            matches = false;
-
-            // Perform comparison for every entered value of or operator
-            for (int index = 0; index < values.length; index++) {
-                String value = values[index].trim();
-
-                // Verify that value is not empty
-                if (!value.equals("")) {
-                    matches = compareWithOperatorValue(value, actualValue, operator);
-
-                    // Break out of loop when at least one expected value matches actual value
-                    if (matches) {
-                        break;
-                    }
-                }
-            }
+            operator = "|";
+            matches = compareWithOperatorValue(querySearch, actualValue, operator);
+            // Invert answer if using NOT ANY operator
+            if (querySearch.startsWith("!")) matches = !matches;
 
             // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
         } else if (querySearch.matches("[><]=?[0-9]+")) {
@@ -149,8 +141,11 @@ public class JsonFilter {
      */
     private static boolean compareWithOperatorValue(String value1, String value2, String operator) {
         boolean result = false;
+        // If OR operator then check contained value
+        if (operator.equals("|")) {
+            result = value1.contains(value2);
         // If NOT EQUAL operator then
-        if (operator.equals("!=")) {
+        } else if (operator.equals("!=")) {
             result = !value1.equals(value2);
             // If equals operator then check if contains value
         } else if (operator.equals("=")) {
