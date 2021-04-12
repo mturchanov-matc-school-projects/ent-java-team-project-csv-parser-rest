@@ -4,28 +4,31 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.util.Properties;
 
 /**
  * This class serves to provide several utility methods for writing files in the web application.
  * @author pjcraig
  */
-public class CSVFileWriter implements PropertiesLoader {
-    private Properties properties;
-    private String uploadPath;
+public class CSVFileWriter {
+    private final String uploadPath;
 
     private final Logger logger = LogManager.getLogger();
-
-    public static final String PROPERTIES_PATH = "/webapp.properties";
-    public static final String UPLOAD_PATH_PROPERTY = "upload.path";
 
     /**
      * Constructs a new FileProcessor with access to the web app properties.
      */
     public CSVFileWriter() {
-        properties = loadProperties(PROPERTIES_PATH);
-        uploadPath = properties.getProperty(UPLOAD_PATH_PROPERTY);
+        Path path = Paths.get(this.getClass().getResource("/").getPath());
+        uploadPath = path.toString() + "/uploads";
+
+        // Attempt to create file path if it doesn't exist
+        File file = new File(uploadPath);
+        if (!file.exists()) {
+            file.mkdir();
+        }
     }
 
     /**
