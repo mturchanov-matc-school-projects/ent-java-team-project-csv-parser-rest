@@ -26,16 +26,13 @@
 <div class="container bg-white p-3">
     <h1>JSON Query API</h1>
 
-
     <div class="card">
         <div class="card-body">
             <p class="card-title h3">Introduction</p>
             <p class="card-text">The JSON Query RESTful API provides the ability to search a given set of JSON data and
-                return all matching
-                JSON elements. </p>
+                return all matching JSON elements. </p>
             <p class="card-text">The API expects a list of JSON elements containing the same fields as each other. If an
-                element
-                does not contain a field, that element gets ignored.</p>
+                element does not contain a field, that element gets ignored.</p>
         </div>
     </div>
     <div class="card">
@@ -46,27 +43,32 @@
 
             <ol class="card-text">
                 <li><b>Use an environment</b> you like to make a POST request</li>
-                <li><b>In POST request</b> specify <code>Content-Type</code> as <code>application/json</code></li>
-                <li><b>Write or enter</b> to POST body csv-data or JSOn-data</li>
-                <li><b>Receive parsed response</b></li>
+                <li><b>In POST request</b> specify a CSV file to upload using the <code>&lt;file&gt;</code> form parameter</li>
+                <li><b>Write or specify</b> the <code>&lt;search&gt;</code> criteria form parameter as a JSON object containing each column to filter</li>
+                <li><b>Submit</b> and receive the parsed response</li>
             </ol>
             <hr>
             <details>
                 <summary class="card-title h4">Example with curl</summary>
-                <pre class="card-text">curl -i -X POST -H "Content-Type: application/json" -d '[{"fruit":"banana", "number": 30 }, {"fruit":"apple", "number": 15 }, {"fruit":"apple","number": 2 }, {"fruit":"banana","number": 12}]' http://localhost:8080/csvparser/rest/jsonqueryservice/search?fruit=banana</pre>
+                <p>Using a sample file called <a href="resources/fruits.csv">fruits.csv</a>...</p>
+                <pre class="card-text">curl -X POST -F "file=@fruits.csv" -F 'search={"fruit":"banana"}' "${baseUrl}rest/jsonqueryservice/search"</pre>
                 <p class="card-title h4">Expected response</p>
                 <pre class="card-text" style="background:#eee;">
 [
     {
         "fruit":"banana",
-        "number": 30
+        "count":30
     },
     {
         "fruit":"banana",
-        "number": 12
+        "count":23
     }
 ]
 </pre>
+                <p class="card-title h4">Explanation</p>
+                <p class="card-text">The POST request passes the <code>fruits.csv</code> file as well as a search
+                    criteria JSON object consisting of each column to search in. Since there are two JSON objects
+                    that have a <code>fruit</code> value of <code>banana</code>, two JSON objects are returned.</p>
             </details>
 
 
@@ -88,7 +90,10 @@
 
     <div class="card">
         <div class="card-body">
-            All query parameters on all endpoints are <span class="text-danger">optional!</span>
+            <p>All query parameters on all endpoints are <span class="text-danger">optional!</span></p>
+            <p>Search query parameters <span class="text-danger">must</span> match the CSV column name and have appropriate
+                type value.
+            </p>
         </div>
     </div>
 
@@ -97,29 +102,53 @@
         <tr>
             <th>Endpoint</th>
             <th>Method</th>
-            <th>Optional</th>
-            <th>Example</th>
+            <th>Required Parameters</th>
+            <th>Optional Parameters</th>
             <th>Description</th>
             <th>Note</th>
         </tr>
         <tr>
             <td><span class="text-danger">/search</span></td>
             <td>GET</td>
-            <td><span class="text-danger">yes</span></td>
-            <td><code>?closed=true&monthsOpen=8</code></td>
-            <td>Returns JSON from parsed csv-file. If parameters are entered then returns a filtered JSON</td>
-            <td>Query parameter <span class="text-danger">must</span> be same as csv-column name and has appropriate
-                type value.
+            <td><code>None</code></td>
+            <td><code>Can vary</code></td>
+            <td>Returns JSON from parsed CSV file. If parameter(s) are entered, then returns an array of filtered JSON</td>
+            <td>In order to query using a GET request, a POST request <span class="text-danger">must</span> first be
+                made to ${baseUrl}upload containing the CSV <code>&lt;file&gt;</code> or raw <code>&lt;csvText&gt;</code> parameters.
+                The POST session data <span class="text-danger">must</span> be retained and provided for all subsequent
+                GET requests.
             </td>
         </tr>
         <tr>
             <td><span class="text-danger">/count</span></td>
             <td>GET</td>
-            <td><span class="text-danger">yes</span></td>
-            <td><code>?closed=true&monthsOpen=8</code></td>
-            <td>Returns count of items. If parameter(s) were applied then returns the a number of filtered items</td>
-            <td>Query parameter <span class="text-danger">must</span> be same as csv-column name and has appropriate
-                type value.
+            <td><code>None</code></td>
+            <td><code>Can vary</code></td>
+            <td>Returns count of items. If parameter(s) were applied, then returns the number of filtered items</td>
+            <td>In order to query using a GET request, a POST request <span class="text-danger">must</span> first be
+                made to ${baseUrl}upload containing the CSV <code>&lt;file&gt;</code> or raw <code>&lt;csvText&gt;</code> parameters.
+                The POST session data <span class="text-danger">must</span> be retained and provided for all subsequent
+                GET requests.
+            </td>
+        </tr>
+        <tr>
+            <td><span class="text-danger">/search</span></td>
+            <td>POST</td>
+            <td><code>&lt;file&gt;</code></td>
+            <td><code>&lt;search&gt;</code></td>
+            <td>Returns JSON from the provided CSV file. If a JSON object search parameter is entered, then returns an array of filtered JSON</td>
+            <td>Query parameters <span class="text-danger">must</span> match the CSV column name and have appropriate
+                type value. Subsequent GET requests can be made if session data is provided.
+            </td>
+        </tr>
+        <tr>
+            <td><span class="text-danger">/count</span></td>
+            <td>POST</td>
+            <td><code>&lt;file&gt;</code></td>
+            <td><code>&lt;search&gt;</code></td>
+            <td>Returns count of items. If a JSON object search parameter is entered, then returns an array of filtered JSON</td>
+            <td>Query parameters <span class="text-danger">must</span> match the CSV column name and have appropriate
+                type value. Subsequent GET requests can be made if session data is provided.
             </td>
         </tr>
     </table>
@@ -128,13 +157,89 @@
     <hr>
 
     <div class="card">
-        <div class="card-body">
-            <p class="card-title h5">Example <code>GET</code> request:</p>
-            <pre>http://localhost:8080/csvparser/rest/jsonqueryservic/search?closed=false&monthsOpen=8</pre>
-        </div>
+        <details class="m-2">
+            <summary class="card-title h5">Additional Filtering Options</summary>
+            <div class="card-body">
+                <p class="card-text">Aside from comparing exact values, there are a variety of additional comparison and
+                    filtering operators available for use. Note that operators cannot be mixed in a single query parameter.
+                </p>
+                <table>
+                    <tr>
+                        <th>Operator</th>
+                        <th>Description</th>
+                        <th>Syntax</th>
+                        <th>Example</th>
+                        <th>Explanation</th>
+                    </tr>
+                    <tr>
+                        <td>NOT</td>
+                        <td>Filter out all values that do not match specified value.</td>
+                        <td><code>!...</code></td>
+                        <td><code>?fruit=!banana</code></td>
+                        <td>Get all fruits that are not a banana.</td>
+                    </tr>
+                    <tr>
+                        <td>OR</td>
+                        <td>Filter all values that match at least one query value.</td>
+                        <td><code>...|...</code></td>
+                        <td><code>?fruit=banana|apple</code></td>
+                        <td>Get all bananas or apples.</td>
+                    </tr>
+                    <tr>
+                        <td>NOR</td>
+                        <td>Filter out all of the specified values.</td>
+                        <td><code>!...|...</code></td>
+                        <td><code>?fruit=!banana|apple|orange</code></td>
+                        <td>Get all fruits that are not a banana, apple, or orange.</td>
+                    </tr>
+                    <tr>
+                        <td>Numerical Comparison</td>
+                        <td>Filter out all numeric values that do not compare in amount.</td>
+                        <td><code>[<|>|<=|>=]...</code></td>
+                        <td><code>?fruit=banana&count=>25</code></td>
+                        <td>Get all bananas that count more than 25.</td>
+                    </tr>
+                    <tr>
+                        <td>REGEX Comparison</td>
+                        <td>Filter in all values that match the provided REGEX.</td>
+                        <td><code>/.../</code></td>
+                        <td><code>?fruit=/^p.+/</code></td>
+                        <td>Get all fruits that start with a 'p'.</td>
+                    </tr>
+                </table>
+            </div>
+        </details>
     </div>
 
+    <div class="card">
+        <details class="m-2">
+            <summary class="card-title h5">Making <code>GET</code> requests with curl</summary>
+            <div class="card-body">
+                <ol>
+                    <li class="card-text">
+                        Upload CSV file and store session data (using <a href="resources/fruits.csv">fruits.csv</a>)
+                        <br>
+                        <pre>curl -X POST -c cookies.txt -F "file=@fruits.csv" -o output.txt "${baseUrl}upload"</pre>
+                    </li>
+                    <li class="card-text">
+                        Make request with session data included
+                        <pre>curl -X GET -b cookies.txt -o output.txt "${baseUrl}rest/jsonqueryservice/search?fruit=banana"</pre>
+                    </li>
+                </ol>
+            </div>
+        </details>
+    </div>
 
+    <div class="card">
+        <details class="m-2">
+            <summary class="card-title h5">Making <code>POST</code> requests with curl</summary>
+            <div class="card-body">
+                <p class="card-text">Post CSV file (using <a href="resources/fruits.csv">fruits.csv</a>)</p>
+                <pre class="card-text">curl -X POST -F "file=@fruits.csv" -F 'search={"fruit":"banana","number":30}' "${baseUrl}rest/jsonqueryservice/search"</pre>
+                <p><span class="text-danger">*</span>Subsequent requests must be made through GET and include session data.</p>
+            </div>
+        </details>
+    </div>
 
 </div>
 </body>
