@@ -126,6 +126,8 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
             session.setAttribute("columns", columns);
             session.setAttribute("json", rawJson);
 
+            writer.delete(path);
+
             // Escape loop since only 1 CSV file is allowed at a time
             return true;
         } else {
