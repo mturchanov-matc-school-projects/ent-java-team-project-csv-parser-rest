@@ -4,7 +4,6 @@
 <c:set var="title" value="CSV Parser - Filter" scope="request"></c:set>
 <c:import url="templates/head.jsp"></c:import>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="js/textareaBeutifier.js"></script>
 
 <style>.pointer {cursor: pointer;}</style>
 <body class="bg-dark">
@@ -41,12 +40,14 @@
 
         <div class="card">
             <div class="card-body">
-                <label id="btnJson" class="pointer" for="textarea">Click to expend and beautify JSON</label>
+                <button id="btnJson" class="pointer btn btn-secondary" >Show JSON</button>
                 <textarea id="textarea" class="form-control" readonly>${json}</textarea>
             </div>
         </div>
     </div>
 </body>
+<script src="js/textareaBeautifier.js"></script>
+
 <c:import url="templates/scripts.jsp"></c:import>
 
 <script>
