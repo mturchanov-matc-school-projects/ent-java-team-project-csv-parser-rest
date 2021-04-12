@@ -1,22 +1,20 @@
 package com.ee_java.team_project.controller;
 
+import com.ee_java.team_project.csv_parser.CodingCompCsvUtil;
+import com.ee_java.team_project.util.CSVFileWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.security.Security;
-import java.sql.Timestamp;
-import java.util.*;
-
-import com.ee_java.team_project.csv_parser.CodingCompCsvUtil;
-import com.ee_java.team_project.util.CSVFileWriter;
-import com.ee_java.team_project.util.PropertiesLoader;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Processes POST requests containing an uploaded CSV file.
@@ -31,7 +29,7 @@ import org.apache.logging.log4j.Logger;
         maxFileSize = 1024 * 1024 * 50,      	// 50 MB
         maxRequestSize = 1024 * 1024 * 100   	// 100 MB
 )
-public class UploadAction extends HttpServlet implements PropertiesLoader {
+public class UploadAction extends HttpServlet {
 
     private final Logger logger = LogManager.getLogger();
 
@@ -90,7 +88,7 @@ public class UploadAction extends HttpServlet implements PropertiesLoader {
      */
     public boolean processCSVFile(HttpServletRequest request) {
         CSVFileWriter writer = new CSVFileWriter();
-        String csvText = (String) request.getAttribute("csvText");
+        String csvText = request.getParameter("csvText");
         String path = null;
         // Verify CSV text input exists before checking uploaded file
         if (csvText != null) {
