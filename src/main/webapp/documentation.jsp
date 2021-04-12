@@ -207,6 +207,13 @@
                             <td><code>?fruit=/^p.+/</code></td>
                             <td>Get all fruits that start with a 'p'.</td>
                         </tr>
+                        <tr>
+                            <td>JSON Object Filtering</td>
+                            <td>Filter values that contain certain JSON object data.</td>
+                            <td><code>$...<!-- TODO: Fix object formatting as needed --></code></td>
+                            <td><code>?fruit=$</code></td>
+                            <td>To be completed.</td>
+                        </tr>
                     </table>
                 </div>
             </details>
