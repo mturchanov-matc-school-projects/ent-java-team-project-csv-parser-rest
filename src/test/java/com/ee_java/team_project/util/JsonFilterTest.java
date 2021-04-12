@@ -59,7 +59,9 @@ public class JsonFilterTest {
                 "\":109,\"closed\":\"false\",\"monthsOpen\":4}]";
     }
 
-    //PASSING
+    /**
+     * Verifies that filtering by one parameter functions as expected.
+     */
     @Test
     void filterTestOneParameter() {
         Map<String, String> parameters = new HashMap<>();
@@ -70,7 +72,9 @@ public class JsonFilterTest {
         assertEquals(expectedResults, stringResults);
     }
 
-    //PASSING
+    /**
+     * Verifies that filtering by two parameter functions as expected.
+     */
     @Test
     void filterTestTwoParameter() {
         testData = "[{\"claimId\":3,\"customerId\":353,\"closed\":\"true\",\"monthsOpen\":4},{\"claimId\":225," +
@@ -85,7 +89,9 @@ public class JsonFilterTest {
         assertEquals(expectedResults, stringResults);
     }
 
-    //PASSING
+    /**
+     * Verifies that filtering by the GREATER THAN (>) operator functions as expected.
+     */
     @Test
     void filterWithGreaterThan() {
         testData = "[{\"claimId\":994,\"customerId\":120,\"closed\":\"true\",\"monthsOpen\":7},{\"claimId\":995," +
@@ -107,7 +113,9 @@ public class JsonFilterTest {
         assertEquals(expectedResults, stringResults);
     }
 
-    //PASSING
+    /**
+     * Verifies that filtering by the LESS THAN (<) operator functions as expected.
+     */
     @Test
     void filterWithLessThan() {
         testData = "[{\"claimId\":1,\"customerId\":140,\"closed\":\"false\",\"monthsOpen\":8},{\"claimId\":2," +
@@ -133,7 +141,9 @@ public class JsonFilterTest {
         assertEquals(expectedResults, stringResults);
     }
 
-    //NOT WORKING CURRENTLY
+    /**
+     * Verifies that filtering by the GREATER THAN OR EQUAL TO (>=) operator functions as expected.
+     */
     @Test
     void filterWithGreaterOrEqualTo() {
         testData = "[{\"claimId\":993,\"customerId\":127,\"closed\":\"true\",\"monthsOpen\":4},{\"claimId\":994," +
@@ -159,7 +169,9 @@ public class JsonFilterTest {
         assertEquals(expectedResults, stringResults);
     }
 
-    //NOT WORKING CURRENTLY
+    /**
+     * Verifies that filtering by the LESS THAN OR EQUAL TO operator (<=) functions as expected.
+     */
     @Test
     void filterWithLessOrEqualTo() {
         testData = "[{\"claimId\":1,\"customerId\":140,\"closed\":\"false\",\"monthsOpen\":8},{\"claimId\":2," +
@@ -185,7 +197,9 @@ public class JsonFilterTest {
         assertEquals(expectedResults, stringResults);
     }
 
-    //PASSING
+    /**
+     * Verifies that filtering by the OR (|) operator functions as expected.
+     */
     @Test
     void filterWithOr() {
         testData = "[{\"claimId\":994,\"customerId\":120,\"closed\":\"true\",\"monthsOpen\":7},{\"claimId\":995," +
@@ -206,7 +220,7 @@ public class JsonFilterTest {
     }
 
     /**
-     * Tests filtering JSON data using the NOT EQUAL operator.
+     * Verifies filtering JSON data using the NOT EQUAL operator (!=) functions as expected.
      */
     @Test
     void filterWithNotEquals() {
