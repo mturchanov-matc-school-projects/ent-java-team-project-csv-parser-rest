@@ -262,10 +262,10 @@
                         </tr>
                         <tr>
                             <td>JSON Object Filtering</td>
-                            <td>Filter values that contain certain JSON object data.</td>
-                            <td><code>$...<!-- TODO: Fix object formatting as needed --></code></td>
-                            <td><code>?fruit=$</code></td>
-                            <td>To be completed.</td>
+                            <td>Filter values that contain certain JSON object data using jsonPath</td>
+                            <td><code>$...</code></td>
+                            <td><code>$..[?(@.firstName== 'Trudie')]</code></td>
+                            <td>See documentation for <a href="https://github.com/json-path/JsonPath">JsonPath</a></td>
                         </tr>
                     </table>
                 </div>
