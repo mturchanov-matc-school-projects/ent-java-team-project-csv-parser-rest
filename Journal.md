@@ -64,3 +64,13 @@ Tasks Completed:
 * Add feature to paste raw CSV code into input form for parsing
 * Test endpoints using curl
 * Clean up JSP styling
+
+4/12/2021 ~ 5 hours
+* JSON Object filtering support added
+* Updated file storage to be in local resources
+* Finished endpoint and filter documentation
+* Finalized project documentation
+* Generated javadoc
+* Deploy application to AWS
+
+Total Time: ~ 50 hours
