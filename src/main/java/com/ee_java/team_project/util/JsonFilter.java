@@ -110,14 +110,14 @@ public class JsonFilter {
             String queryValue = querySearch.replaceAll("!=", "");
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
 
-        // Check if actual value contains any of the values from the entered query search (OR operator)
+            // Check if actual value contains any of the values from the entered query search (OR operator)
         } else if (querySearch.contains("|")) {
             operator = "|";
             matches = compareWithOperatorValue(querySearch, actualValue, operator);
             // Invert answer if using NOT ANY operator
             if (querySearch.startsWith("!")) matches = !matches;
 
-        // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
+            // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
         } else if (querySearch.matches("[><]=?[0-9]+")) {
             String queryValue = querySearch.replaceAll("[><]=?", "");
             operator = querySearch.replaceAll("[0-9]+", "");
@@ -147,7 +147,7 @@ public class JsonFilter {
         // If NOT EQUAL operator then
         } else if (operator.equals("!=")) {
             result = !value1.equals(value2);
-        // If equals operator then check if contains value
+            // If equals operator then check if contains value
         } else if (operator.equals("=")) {
             result = value1.equals(value2);
         } else {
