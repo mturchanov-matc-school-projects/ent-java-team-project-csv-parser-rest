@@ -1,4 +1,4 @@
-#State Farm 2020 Java Coding Competition 
+<h1>State Farm 2020 Java Coding Competition</h1> 
 
 The Problem
 Welcome to the 2020 State Farm Java Coding Competition. For this year’s challenge, you will be provided with a skeleton Java project with ten JUnit Tests and the stubs of their corresponding methods, as well as four sets of data:
