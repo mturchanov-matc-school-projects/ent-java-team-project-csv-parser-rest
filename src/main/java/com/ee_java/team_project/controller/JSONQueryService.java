@@ -28,6 +28,7 @@ public class JSONQueryService {
     /**
      * Returns the number of elements found from performing a GET JSON query.
      * @param uriInfo The URI info that contains query parameters to search with.
+     * @param request The request made to the endpoint.
      * @return The response containing the queried JSON element.
      */
     @GET
@@ -48,6 +49,7 @@ public class JSONQueryService {
     /**
      * Returns a JSON array response containing the JSON elements found from performing a GET JSON query.
      * @param uriInfo The URI info that contains query parameters to search with.
+     * @param request The request made to the endpoint.
      * @return The response containing the queried JSON element.
      */
     @GET
@@ -68,13 +70,15 @@ public class JSONQueryService {
      * Returns the number of elements found from performing a POST JSON query.
      * @param file The CSV file.
      * @param jsonSearchFilter The JSON object containing column filters.
+     * @param request The request made to the endpoint.
      * @return The response containing the number of resulting JSON elements from the query.
      */
     @POST
     @Path("/count")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response postCountJson(@FormDataParam("file") File file, @FormDataParam("search") String jsonSearchFilter) {
+    public Response postCountJson(@FormDataParam("file") File file, @FormDataParam("search") String jsonSearchFilter,
+            @Context HttpServletRequest request) {
 
         // Write file to disk
         CSVFileWriter writer = new CSVFileWriter();
@@ -82,7 +86,7 @@ public class JSONQueryService {
 
         // Verify that the file was written successfully
         if (path != null) {
-            int count = processCSVFilter(path, jsonSearchFilter).size();
+            int count = processCSVFilter(path, jsonSearchFilter, request).size();
             String finalJson = String.format("{\"count\":%d}", count);
 
             // Remove uploaded file when done
@@ -98,13 +102,15 @@ public class JSONQueryService {
      * Returns JSON elements based on the JSON to filter and a list of columns and values to compare.
      * @param file The CSV file.
      * @param jsonSearchFilter The JSON object containing column filters.
+     * @param request The request made to the endpoint.
      * @return The response containing the queried JSON element.
      */
     @POST
     @Path("/search")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    public Response postSearchJson(@FormDataParam("file") File file, @FormDataParam("search") String jsonSearchFilter) {
+    public Response postSearchJson(@FormDataParam("file") File file, @FormDataParam("search") String jsonSearchFilter,
+            @Context HttpServletRequest request) {
 
         // Write file to disk
         CSVFileWriter writer = new CSVFileWriter();
@@ -112,7 +118,7 @@ public class JSONQueryService {
 
         // Verify that the file was written successfully
         if (path != null) {
-            String finalJson = processCSVFilter(path, jsonSearchFilter).toString();
+            String finalJson = processCSVFilter(path, jsonSearchFilter, request).toString();
 
             // Remove uploaded file when done
             writer.delete(path);
@@ -128,16 +134,23 @@ public class JSONQueryService {
      * filtered JSON is returned as a JSON array.
      * @param path The path to the CSV file.
      * @param jsonSearchFilter The JSON object containing column filters.
+     * @param request The request made to store session data into.
      * @return The filtered JSON array of JSON objects.
      */
-    private JsonArray processCSVFilter(String path, String jsonSearchFilter) {
+    private JsonArray processCSVFilter(String path, String jsonSearchFilter, HttpServletRequest request) {
         logger.debug("Processing filter {}", jsonSearchFilter);
         CodingCompCsvUtil parser = new CodingCompCsvUtil();
         Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
 
         // Retrieves the raw JSON text from the values map, expecting only 1 entry in the map
         Map.Entry<List<String>, String> entry = values.entrySet().iterator().next();
+        List<String> columns = entry.getKey();
         String rawJson = entry.getValue();
+
+        // Store column and JSON data
+        HttpSession session = request.getSession();
+        session.setAttribute("columns", columns);
+        session.setAttribute("json", rawJson);
 
         // Retrieve search query parameters
         Map<String, String> parameters = processJsonQueryParameters(jsonSearchFilter);
