@@ -20,23 +20,36 @@
                 </c:when>
             </c:choose>
 
-            <form id="queryForm" action="rest/jsonqueryservice/search" method="get">
-                <p>Enter Values to Search</p>
 
-                <c:forEach var="column" items="${columns}">
-                    <div class="form-group">
-                        <label for="${column}">${column}</label>
-                        <input type="text" id="${column}" name="${column}" class="form-control">
+            <fieldset>
+                <form id="queryForm" action="rest/jsonqueryservice/search" method="get">
+                    <c:forEach var="column" items="${columns}">
+                        <div class="form-group row">
+                            <label for="${column}" class="col-sm-2 col-form-label">${column}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="${column}" class="form-control" id="${column}">
+                            </div>
+                        </div>
+                    </c:forEach>
+
+                    <div class="form-group row">
+                        <div class="col-sm-2">Count Results</div>
+                        <div class="col-sm-10">
+                            <div class="form-check">
+                                <input id="countResults" type="checkbox" class="form-check-input">
+                            </div>
+                        </div>
                     </div>
-                </c:forEach>
 
-                <div class="form-check pb-3">
-                    <input id="countResults" type="checkbox" class="form-check-input">
-                    <label for="countResults" class="form-check-label">Count Results</label>
-                </div>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </fieldset>
 
-                <input type="submit" class="btn btn-primary">
-            </form>
+
 
             <br>
             <hr>
