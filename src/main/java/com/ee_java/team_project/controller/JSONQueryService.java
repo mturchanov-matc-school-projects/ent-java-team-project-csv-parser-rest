@@ -131,6 +131,7 @@ public class JSONQueryService {
      * @return The filtered JSON array of JSON objects.
      */
     private JsonArray processCSVFilter(String path, String jsonSearchFilter) {
+        logger.debug("Processing filter {}", jsonSearchFilter);
         CodingCompCsvUtil parser = new CodingCompCsvUtil();
         Map<List<String>, String> values = parser.readCsvFileFileWithoutPojo(path);
 
