@@ -1,13 +1,11 @@
 package com.ee_java.team_project.util;
 
 import com.google.gson.*;
+import com.jayway.jsonpath.JsonPath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class provides a variety of methods to aid in filtering JSON data.
@@ -62,9 +60,9 @@ public class JsonFilter {
                     }
                 }
             } catch (JsonParseException exception) {
-                logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
+               // logger.error(String.format("Error occurred while parsing JSON %s", json), exception);
             } catch (Exception exception) {
-                logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
+               // logger.error(String.format("Unknown exception while parsing JSON %s", json), exception);
             }
         }
 
@@ -118,7 +116,12 @@ public class JsonFilter {
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
 
         // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
-        } else if (querySearch.matches("[><]=?[0-9]+")) {
+        } else if (querySearch.startsWith("$")) {
+            operator = "$";
+            matches = compareWithOperatorValue(querySearch, actualValue, operator);
+
+            // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
+        }else if (querySearch.matches("[><]=?[0-9]+")) {
             String queryValue = querySearch.replaceAll("[><]=?", "");
             operator = querySearch.replaceAll("[0-9]+", "");
             matches = compareWithOperatorValue(actualValue, queryValue, operator);
@@ -134,27 +137,38 @@ public class JsonFilter {
      * Compares two values against each other using a provided comparison operator. Valid operators are <, <=, >, >=, =,
      * and !=. Numeric comparison operators convert String values to integers and will return false if they cannot be
      * converted.
-     * @param value1 The first value to compare.
-     * @param value2 The second value to compare.
+     * @param userInput The first value to compare.
+     * @param parsedJsonValue The second value to compare.
      * @param operator The operator to compare with (<, <=, >, >=).
      * @return How the first value compares to the second value.
      */
-    private static boolean compareWithOperatorValue(String value1, String value2, String operator) {
+    private static boolean compareWithOperatorValue(String userInput, String parsedJsonValue, String operator) {
         boolean result = false;
         // If OR operator then check contained value
         if (operator.equals("|")) {
-            result = value1.contains(value2);
+            result = userInput.contains(parsedJsonValue);
         // If NOT EQUAL operator then
         } else if (operator.equals("!=")) {
-            result = !value1.equals(value2);
+            result = !userInput.equals(parsedJsonValue);
             // If equals operator then check if contains value
         } else if (operator.equals("=")) {
-            result = value1.equals(value2);
+            result = userInput.equals(parsedJsonValue);
+            // uses jsonPath if parameter-column consist of JSON
+        } else if (operator.equals("$")) {
+            if (parsedJsonValue.isEmpty()) {
+                return false;
+            }
+            List<String> updatedColumnJsonList = new ArrayList<>();
+            parsedJsonValue = parsedJsonValue.replaceAll("\"\"", "\"")
+                    .replaceFirst("^\"","")
+                    .replaceFirst("\"$", "");
+            updatedColumnJsonList = (JsonPath.read(parsedJsonValue, userInput));
+            result = updatedColumnJsonList.size() > 0;
         } else {
             // Compare using numeric operators
             try {
-                int number1 = Integer.parseInt(value1);
-                int number2 = Integer.parseInt(value2);
+                int number1 = Integer.parseInt(userInput);
+                int number2 = Integer.parseInt(parsedJsonValue);
                 if (operator.equals(">")) {
                     result = number1 > number2;
                 } else if (operator.equals("<")) {
