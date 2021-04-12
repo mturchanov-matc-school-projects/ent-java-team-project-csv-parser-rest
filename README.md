@@ -1,4 +1,22 @@
 # RESTful CSV Parser API
+
+### Problem Statement
+
+CSV or comma-separated values files are a common way to exchange large amounts of data between different applications. 
+In their raw state (as viewed from a text editor) they can seem messy. To solve this the file must be parsed! This 
+application aims to provide a service where the user can upload any CSV file and have it parsed into JSON. From there 
+the user can run a number of queries against their newly parsed data. In addition to the web based UI potential users 
+can also access the parsing and query functionality through a Post request!
+
+### Project Objectives
+
+* Create a RESTful service.
+* Create a web application to house it.  
+* Parse incoming CSV file into JSON from both the web application and POST requests.
+* Allow a wide range of querys to be preformed on the newly formatted data sets. 
+* Provide documentation on all services to ensure ease of use for end user.
+
+
 ### Presentation Description/Overview
 #### Description
 The app is a rest CSV parser to JSON format. 
@@ -26,6 +44,6 @@ These steps can be done in one single step if CSV data is POSTed to either of th
 ### Project Design Documents
 
 [//]: # (TODO: Complete missing team project documents)
-* [Link to the problem statement (might be in readme instead?)]()
-* [Link to the project plan]()
+* [Link to the problem statement](README.md)
+* [Link to the project plan](ProjectPlan.md)
 * [Link to the journal](Journal.md)
