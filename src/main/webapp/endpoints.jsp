@@ -3,10 +3,10 @@
 <html lang="en">
 <c:set var="title" value="CSV Parser - Filter" scope="request"></c:set>
 <c:import url="templates/head.jsp"></c:import>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<style>.pointer {cursor: pointer;}</style>
+<link rel="stylesheet" href="css/style.css">
 <body class="bg-dark">
+
+<button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
     <div class="container bg-white p-3">
         <h1>View Converted JSON</h1>
         <p>Select a query option to run on the JSON.</p>
@@ -46,11 +46,9 @@
         </div>
     </div>
 </body>
-<script src="js/textareaBeautifier.js"></script>
 
+<script src="js/textareaBeautifier.js"></script>
+<script src="js/scrollToTop.js"></script>
 <c:import url="templates/scripts.jsp"></c:import>
 
-<script>
-
-</script>
 </html>
