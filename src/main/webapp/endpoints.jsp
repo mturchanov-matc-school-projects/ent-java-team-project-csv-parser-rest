@@ -1,9 +1,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="title" value="CSV Parser - Filter" scope="request" />
+<c:set var="styleSheet" value="endpoints.css" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
-<c:set var="title" value="CSV Parser - Filter" scope="request"></c:set>
-<c:import url="templates/head.jsp"></c:import>
-<link rel="stylesheet" href="css/style.css">
+<c:import url="templates/head.jsp" />
 <body class="bg-dark">
 
 <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
