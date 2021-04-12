@@ -1,8 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="request" value="${pageContext.request}" />
+<c:set var="baseUrl" value="${request.scheme}://${request.serverName}:${request.serverPort}${request.contextPath}/" />
 <!DOCTYPE html>
 <html lang="en">
-<c:set var="title" value="CSV Parser - Upload" scope="request"></c:set>
-<c:import url="templates/head.jsp"></c:import>
+<c:set var="title" value="CSV Parser - Upload" scope="request" />
+<c:import url="templates/head.jsp" />
 <head>
     <style>
         @media (min-width: 576px){
@@ -39,31 +41,32 @@
     <div class="card">
         <div class="card-body">
             <p class="card-title h3">Quick Start Guide</p>
-            <p class="card-text">For developers eager to implement this API here are a few quick steps to parse CSV file
-                to [filtered] JSON:</p>
+            <p class="card-text">For developers eager to implement this API, here are a few quick steps to parse a CSV
+                file to filtered JSON:</p>
 
             <ol class="card-text">
-                <li><b>Use environment</b> you like to make a POST request</li>
-                <li><b>In POST request </b> specify <code>Content-Type</code> as <code>application/json</code></li>
+                <li><b>Use an environment</b> you like to make a POST request</li>
+                <li><b>In POST request</b> specify <code>Content-Type</code> as <code>application/json</code></li>
                 <li><b>Write or enter</b> to POST body csv-data or JSOn-data</li>
                 <li><b>Receive parsed response</b></li>
             </ol>
             <hr>
             <details>
                 <summary class="card-title h4">Example with curl</summary>
-                <pre class="card-text">curl -i -X POST -H "Content-Type: application/json" -d "[{\"fruit\":\"banana\", \"number\": 30 }, {\"fruit\":\"apple\", \"number\": 15 }, {\"fruit\":\"apple\",\"number\": 2 }, {\"fruit\":\"banana\",\"number\": 12}]" http://localhost:8080/csvparser/rest/jsonqueryservice/search?fruit=banana</pre>
+                <pre class="card-text">curl -i -X POST -H "Content-Type: application/json" -d '[{"fruit":"banana", "number": 30 }, {"fruit":"apple", "number": 15 }, {"fruit":"apple","number": 2 }, {"fruit":"banana","number": 12}]' http://localhost:8080/csvparser/rest/jsonqueryservice/search?fruit=banana</pre>
                 <p class="card-title h4">Expected response</p>
-                <pre class="card-text" style="background:#eee;">[
-                    {
-                        "fruit":"banana",
-                        "number": 30
-                    },
-                    {
-                        "fruit":\"banana",
-                        "number": 12
-                    }
-                ]
-            </pre>
+                <pre class="card-text" style="background:#eee;">
+[
+    {
+        "fruit":"banana",
+        "number": 30
+    },
+    {
+        "fruit":"banana",
+        "number": 12
+    }
+]
+</pre>
             </details>
 
 
@@ -81,7 +84,7 @@
     <hr>
     <br>
     <h3>Send all data requests to: </h3>
-    <pre>http://localhost:8080/csvparser/<span class="text-danger">rest/jsonqueryservice/</span></pre>
+    <pre>${baseUrl}<span class="text-danger">rest/jsonqueryservice/</span></pre>
 
     <div class="card">
         <div class="card-body">
