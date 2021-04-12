@@ -44,8 +44,7 @@ public class JsonFilter {
                             boolean allMatches = true;
                             for (Map.Entry<String, String> entry : parametersCopy.entrySet()) {
                                 String column = entry.getKey();
-                                String value = entry.getValue();
-
+                                String value = entry.getValue().replaceAll("^\"|\"$", "");
                                 // Verify that the given column exists on the object as a property
                                 if (currentObject.has(column)) {
                                     String foundValue = currentObject.get(column).toString().replaceAll("^\"|\"$", "");
@@ -104,11 +103,6 @@ public class JsonFilter {
         if (querySearch.matches("^\\/.+\\/$")) {
             String regex = querySearch.replaceAll("^\\/|\\/$", "");
             matches = actualValue.matches(regex);
-        // Check if entered value is not equal to actual value
-        } else if (querySearch.contains("!=")) {
-            operator = "!=";
-            String queryValue = querySearch.replaceAll("!=", "");
-            matches = compareWithOperatorValue(queryValue, actualValue, operator);
 
             // Check if actual value contains any of the values from the entered query search (OR operator)
         } else if (querySearch.contains("|")) {
@@ -117,7 +111,13 @@ public class JsonFilter {
             // Invert answer if using NOT ANY operator
             if (querySearch.startsWith("!")) matches = !matches;
 
-            // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
+        // Check if entered value is not equal to actual value
+        } else if (querySearch.startsWith("!")) {
+            operator = "!=";
+            String queryValue = querySearch.replaceAll("^!", "");
+            matches = compareWithOperatorValue(queryValue, actualValue, operator);
+
+        // Compare values using numeric comparison (LESS THAN, GREATER THAN, etc.)
         } else if (querySearch.matches("[><]=?[0-9]+")) {
             String queryValue = querySearch.replaceAll("[><]=?", "");
             operator = querySearch.replaceAll("[0-9]+", "");
@@ -173,6 +173,4 @@ public class JsonFilter {
 
         return result;
     }
-
-
 }

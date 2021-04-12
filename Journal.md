@@ -45,3 +45,22 @@ Tasks Completed:
 * Removed old Test endpoint
 * Add POST endpoints for non-web based JSON filtering by POSTing data in request body
 * Add methods to parse and process POST body data and convert it into usable data
+
+4/10/2021 ~ 11 hours
+* Add filter options for numbers and values
+* Fix logic for numeric comparison operators on right-side of value
+* Flesh out design for documentation.jsp
+* Create test classes for JsonFilter and CsvUtil classes
+* Update POST endpoints to process and filter data in one request
+* Test endpoints using curl
+
+4/11/2021 ~ 7 hours
+* Finish implementing QueryParamData annotations into JSONQueryService
+* Move file handling into CSVFileWriter utility class
+* Add more filtering options including OR, NOR, NOT, and REGEX
+* Update file error handling on UploadAction servlet
+* Update documentation with new endpoints
+* Update test classes with new filtering options
+* Add feature to paste raw CSV code into input form for parsing
+* Test endpoints using curl
+* Clean up JSP styling
