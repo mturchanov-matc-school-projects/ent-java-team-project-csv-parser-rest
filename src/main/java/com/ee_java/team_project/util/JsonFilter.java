@@ -44,8 +44,7 @@ public class JsonFilter {
                             boolean allMatches = true;
                             for (Map.Entry<String, String> entry : parametersCopy.entrySet()) {
                                 String column = entry.getKey();
-                                String value = entry.getValue();
-
+                                String value = entry.getValue().replaceAll("^\"|\"$", "");
                                 // Verify that the given column exists on the object as a property
                                 if (currentObject.has(column)) {
                                     String foundValue = currentObject.get(column).toString().replaceAll("^\"|\"$", "");
