@@ -2,31 +2,16 @@
 <c:set var="request" value="${pageContext.request}" />
 <c:set var="baseUrl" value="${request.scheme}://${request.serverName}:${request.serverPort}${request.contextPath}/" />
 <c:set var="title" value="CSV Parser - Upload" scope="request" />
+<c:set var="styleSheet" value="documentation.css" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
 <c:import url="templates/head.jsp" />
-<head>
-    <style>
-        @media (min-width: 576px){
-            .container, .container-sm {
-                max-width: 85%;
-            }
-        }
-        th, td {
-            padding:1em;
-        }
-        pre {
-            background: #eeeeee;
-            padding: 1em;
-        }
-    </style>
-</head>
 <body class="bg-dark">
 
 <div class="container bg-white p-0">
     <c:import url="templates/header.jsp" />
 
-    <main class="m-3">
+    <main class="m-3 pb-3">
         <h1>JSON Query API</h1>
 
         <div class="card">
@@ -38,6 +23,7 @@
                     element does not contain a field, that element gets ignored.</p>
             </div>
         </div>
+
         <div class="card">
             <div class="card-body">
                 <p class="card-title h3">Quick Start Guide</p>
