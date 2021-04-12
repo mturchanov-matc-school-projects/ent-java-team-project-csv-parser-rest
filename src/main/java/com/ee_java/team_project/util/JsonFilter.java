@@ -90,7 +90,8 @@ public class JsonFilter {
 
     /**
      * Compares the user-entered query to the actual value. The query search can contain numerical comparison operators
-     * such as >, >=, <, and <=. If no operator is specified, the values are compared exactly.
+     * such as >, >=, <, and <=. If no operator is specified, the values are compared exactly. Regex can also be entered
+     * by putting Java-compatible regex inside forward slashes (/).
      * @param querySearch The user-entered query to search with.
      * @param actualValue The actual value to compare against.
      * @return Whether or not the query search compares to the actual value.
@@ -99,8 +100,12 @@ public class JsonFilter {
         boolean matches;
         String operator = "=";
 
+        // Check if entered value contains regex and process actual value using it
+        if (querySearch.matches("^\\/.+\\/$")) {
+            String regex = querySearch.replaceAll("^\\/|\\/$", "");
+            matches = actualValue.matches(regex);
         // Check if entered value is not equal to actual value
-        if (querySearch.contains("!=")) {
+        } else if (querySearch.contains("!=")) {
             operator = "!=";
             String queryValue = querySearch.replaceAll("!=", "");
             matches = compareWithOperatorValue(queryValue, actualValue, operator);
