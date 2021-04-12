@@ -16,7 +16,7 @@
             padding:1em;
         }
         pre {
-            background: #eee;
+            background: #eeeeee;
             padding: 1em;
         }
     </style>
@@ -70,8 +70,6 @@
                     criteria JSON object consisting of each column to search in. Since there are two JSON objects
                     that have a <code>fruit</code> value of <code>banana</code>, two JSON objects are returned.</p>
             </details>
-
-
         </div>
     </div>
 

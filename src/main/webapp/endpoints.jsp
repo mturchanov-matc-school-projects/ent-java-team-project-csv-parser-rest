@@ -3,7 +3,10 @@
 <html lang="en">
 <c:set var="title" value="CSV Parser - Filter" scope="request"></c:set>
 <c:import url="templates/head.jsp"></c:import>
+<link rel="stylesheet" href="css/style.css">
 <body class="bg-dark">
+
+<button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
     <div class="container bg-white p-3">
         <h1>View Converted JSON</h1>
         <p>Select a query option to run on the JSON.</p>
@@ -15,11 +18,6 @@
         </c:choose>
 
         <form id="queryForm" action="rest/jsonqueryservice/search" method="get">
-            <div class="form-group">
-                <label for="jsonTextArea">Parsed JSON</label>
-                <textarea id="jsonTextArea" class="form-control" readonly>${json}</textarea>
-            </div>
-
             <p>Enter Values to Search</p>
 
             <c:forEach var="column" items="${columns}">
@@ -36,7 +34,21 @@
 
             <input type="submit" class="btn btn-primary">
         </form>
+
+        <br>
+        <hr>
+
+        <div class="card">
+            <div class="card-body">
+                <button id="btnJson" class="pointer btn btn-secondary" >Show JSON</button>
+                <textarea id="textarea" class="form-control" readonly>${json}</textarea>
+            </div>
+        </div>
     </div>
 </body>
+
+<script src="js/textareaBeautifier.js"></script>
+<script src="js/scrollToTop.js"></script>
 <c:import url="templates/scripts.jsp"></c:import>
+
 </html>
