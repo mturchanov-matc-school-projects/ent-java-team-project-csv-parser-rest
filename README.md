@@ -8,6 +8,9 @@ application aims to provide a service where the user can upload any CSV file and
 the user can run a number of queries against their newly parsed data. In addition to the web based UI potential users 
 can also access the parsing and query functionality through a Post request!
 
+Originally this project was based on the [State Farm 2020 Coding Competition](OriginalProblemStatement.md) but was
+heavily modified to meet this projects specifications.
+
 ### Project Objectives
 
 * Create a RESTful service.
@@ -44,6 +47,5 @@ These steps can be done in one single step if CSV data is POSTed to either of th
 ### Project Design Documents
 
 [//]: # (TODO: Complete missing team project documents)
-* [Link to the problem statement](README.md)
 * [Link to the project plan](ProjectPlan.md)
 * [Link to the journal](Journal.md)
