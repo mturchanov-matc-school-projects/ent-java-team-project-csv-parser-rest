@@ -56,7 +56,7 @@
                     <ol>
                         <li><b>Upload a CSV file</b></li>
                         <ol>
-                            <li><b>Read </b><a href="documentation.jsp">documentation</a> if parsed data filtering needed</li>
+                            <li><b>Read </b><a href="#filteringOptions">documentation</a> if parsed data filtering needed</li>
                             <li><b>Fulfill inputs</b> in a form to generate a filtered JSON from parsed csv-file</li>
                         </ol>
                         <li><b>Receive JSON</b></li>
