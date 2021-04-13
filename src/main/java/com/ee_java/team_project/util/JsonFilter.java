@@ -104,8 +104,20 @@ public class JsonFilter {
 
             // Check if actual value contains any of the values from the entered query search (OR operator)
         } else if (querySearch.contains("|")) {
-            operator = "|";
-            matches = compareWithOperatorValue(querySearch, actualValue, operator);
+            operator = "=";
+
+            String[] queryValues = querySearch.split("|");
+            matches = false;
+            for (int index = 0; index < queryValues.length; index++) {
+                String value = queryValues[index].trim();
+                if (!value.isEmpty()) {
+                    if (compareWithOperatorValue(value, actualValue, operator)) {
+                        matches = true;
+                        break;
+                    }
+                }
+            }
+
             // Invert answer if using NOT ANY operator
             if (querySearch.startsWith("!")) matches = !matches;
 
