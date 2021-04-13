@@ -106,7 +106,7 @@ public class JsonFilter {
         } else if (querySearch.contains("|")) {
             operator = "=";
 
-            String[] queryValues = querySearch.split("|");
+            String[] queryValues = querySearch.split("\\|");
             matches = false;
             for (int index = 0; index < queryValues.length; index++) {
                 String value = queryValues[index].trim();
